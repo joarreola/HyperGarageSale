@@ -25,7 +25,7 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     compile 'com.android.support:appcompat-v7:25.+'
-    compile 'com.android.support:design:23.1.0'
-    compile 'com.android.support:recyclerview-v7:23.+'
+    compile 'com.android.support:design:25.1.0'
+    compile 'com.android.support:recyclerview-v7:25.+'
     testCompile 'junit:junit:4.12'
 }

@@ -1,18 +1,32 @@
 package com.ucsc.taiyo.hypergaragesale;
 
+import android.content.ContentResolver;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.app.ActionBar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.database.sqlite.SQLiteDatabase;
 import android.content.ContentValues;
+import android.widget.Button;
 import android.widget.EditText;
 import android.content.Intent;
-import android.support.v7.widget.RecyclerView;
+import android.widget.ImageView;
+
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class NewPostActivity extends AppCompatActivity {
 
@@ -23,6 +37,12 @@ public class NewPostActivity extends AppCompatActivity {
     private EditText descText;
     private EditText priceText;
 
+    static final int REQUEST_IMAGE_CAPTURE = 1;
+    static final int REQUEST_TAKE_PHOTO = 2;
+    ImageView mImageView;
+    String mCurrentPhotoPath;
+    Uri photoURI;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,15 +50,98 @@ public class NewPostActivity extends AppCompatActivity {
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        try {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        } catch (NullPointerException ex)
+        {
+            Log.e("setDisplayHomeAsUpEnabl", ex.getMessage());
+        }
 
         titleText = (EditText)findViewById(R.id.textView_title);
         descText = (EditText)findViewById(R.id.textView_desc);
         priceText = (EditText)findViewById(R.id.textView_price);
+        mImageView = (ImageView) findViewById(R.id.CameraImageView);
 
         // Gets the data repository in write mode
         PostsDbHelper mDbHelper = new PostsDbHelper(this);
         db = mDbHelper.getWritableDatabase();
+
+        // camera intent button
+        //FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.camerafab);
+        Button cButton = (Button) findViewById(R.id.cameraButton);
+
+        cButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                //        .setAction("Action", null).show();
+
+                //startActivity(new Intent(getApplicationContext(), NewPostActivity.class));
+
+                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+                if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+                    // Create the File where the photo should go
+                    File photoFile = null;
+                    try {
+                        photoFile = createImageFile();
+                    } catch (IOException ex) {
+                        Log.e("createImageFile failed", ex.getMessage());
+                    }
+
+                    //startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+
+                    // Continue only if the File was successfully created
+                    if (photoFile != null) {
+                        photoURI = FileProvider.getUriForFile(NewPostActivity.this,
+                                "com.ucsc.taiyo.hypergaragesale.android.fileprovider",
+                                photoFile);
+                        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                        startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+                    }
+
+                }
+            }
+        });
+
+        /*
+        private void dispatchTakePictureIntent() {
+            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+            }
+        }
+         */
+    }
+
+    public void grabImage(ImageView mImageView)
+    {
+        this.getContentResolver().notifyChange(photoURI, null);
+        ContentResolver cr = this.getContentResolver();
+        Bitmap bitmap;
+        try
+        {
+            bitmap = android.provider.MediaStore.Images.Media.getBitmap(cr, photoURI);
+            mImageView.setImageBitmap(bitmap);
+        }
+        catch (Exception e)
+        {
+            //Toast.makeText(this, "Failed to load", Toast.LENGTH_SHORT).show();
+            //Log.d(TAG, "Failed to load", e);
+            Log.e("Failed to access photoURI", e.getMessage());
+        }
+    }
+
+    // view thumbnail from camera activity: REQUEST_IMAGE_CAPTURE
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        //if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+        if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
+            //Bundle extras = data.getExtras();
+            //Bitmap imageBitmap = (Bitmap) extras.get("data");
+            //mImageView.setImageBitmap(imageBitmap);
+            grabImage(mImageView);
+        }
     }
 
     private void showSnackBar(View v) {
@@ -62,6 +165,9 @@ public class NewPostActivity extends AppCompatActivity {
         values.put(Posts.PostEntry.COLUMN_NAME_TITLE, titleText.getText().toString());
         values.put(Posts.PostEntry.COLUMN_NAME_DESCRIPTION, descText.getText().toString());
         values.put(Posts.PostEntry.COLUMN_NAME_PRICE, priceText.getText().toString());
+
+        // camera support
+        /* dispatchTakePictureIntent(); */
 
         // Insert the new row, returning the primary key value of the new row
         long newRowId;
@@ -88,5 +194,21 @@ public class NewPostActivity extends AppCompatActivity {
             addPost();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        mCurrentPhotoPath = image.getAbsolutePath();
+        return image;
     }
 }

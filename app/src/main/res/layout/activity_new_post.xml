@@ -44,11 +44,44 @@
     <EditText
         android:layout_width="fill_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_weight="0.11"
         android:gravity="top"
         android:paddingTop="@dimen/activity_vertical_margin"
         android:hint="@string/desc_hint"
         android:id="@+id/textView_desc" />
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/CameraImageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="49dp"
+            android:layout_marginRight="49dp"
+            app:srcCompat="@android:drawable/picture_frame" />
+<!--
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/camerafab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="@dimen/fab_margin"
+            app:srcCompat="@android:drawable/ic_dialog_dialer" />
+-->
+        <Button
+            android:id="@+id/cameraButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Camera"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+    </RelativeLayout>
 
 </LinearLayout>
 

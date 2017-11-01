@@ -90,7 +90,7 @@ public class BrowsePostsActivity extends AppCompatActivity {
                 sortOrder                                 // The sort order
         );
 
-        ArrayList<BrowsePosts> browsePosts = new ArrayList<BrowsePosts>();
+        ArrayList<BrowsePosts> browsePosts = new ArrayList<>();
         if (cursor.moveToFirst()) {
             do {
                 browsePosts.add(new BrowsePosts(
