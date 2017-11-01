@@ -134,7 +134,7 @@ public class NewPostActivity extends AppCompatActivity {
 
     // view thumbnail from camera activity: REQUEST_IMAGE_CAPTURE
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         //if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
             //Bundle extras = data.getExtras();
@@ -142,6 +142,7 @@ public class NewPostActivity extends AppCompatActivity {
             //mImageView.setImageBitmap(imageBitmap);
             grabImage(mImageView);
         }
+        super.onActivityResult(requestCode, resultCode, intent);
     }
 
     private void showSnackBar(View v) {
@@ -165,6 +166,7 @@ public class NewPostActivity extends AppCompatActivity {
         values.put(Posts.PostEntry.COLUMN_NAME_TITLE, titleText.getText().toString());
         values.put(Posts.PostEntry.COLUMN_NAME_DESCRIPTION, descText.getText().toString());
         values.put(Posts.PostEntry.COLUMN_NAME_PRICE, priceText.getText().toString());
+        values.put(Posts.PostEntry.COLUMN_NAME_PHOTO, photoURI.getEncodedPath().toString());
 
         // camera support
         /* dispatchTakePictureIntent(); */
