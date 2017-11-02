@@ -39,7 +39,7 @@ public class NewPostActivity extends AppCompatActivity {
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
     static final int REQUEST_TAKE_PHOTO = 2;
-    ImageView mImageView;
+    //ImageView mImageView;
     String mCurrentPhotoPath;
     Uri photoURI;
 
@@ -60,7 +60,7 @@ public class NewPostActivity extends AppCompatActivity {
         titleText = (EditText)findViewById(R.id.textView_title);
         descText = (EditText)findViewById(R.id.textView_desc);
         priceText = (EditText)findViewById(R.id.textView_price);
-        mImageView = (ImageView) findViewById(R.id.CameraImageView);
+        //mImageView = (ImageView) findViewById(R.id.CameraImageView);
 
         // Gets the data repository in write mode
         PostsDbHelper mDbHelper = new PostsDbHelper(this);
@@ -97,7 +97,7 @@ public class NewPostActivity extends AppCompatActivity {
                                 "com.ucsc.taiyo.hypergaragesale.android.fileprovider",
                                 photoFile);
                         takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                        startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+                        startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
                     }
 
                 }
@@ -113,7 +113,7 @@ public class NewPostActivity extends AppCompatActivity {
         }
          */
     }
-
+/*
     public void grabImage(ImageView mImageView)
     {
         this.getContentResolver().notifyChange(photoURI, null);
@@ -131,16 +131,16 @@ public class NewPostActivity extends AppCompatActivity {
             Log.e("Failed to access photoURI", e.getMessage());
         }
     }
-
+*/
     // view thumbnail from camera activity: REQUEST_IMAGE_CAPTURE
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         //if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-        if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             //Bundle extras = data.getExtras();
             //Bitmap imageBitmap = (Bitmap) extras.get("data");
             //mImageView.setImageBitmap(imageBitmap);
-            grabImage(mImageView);
+            //grabImage(mImageView);
         }
         super.onActivityResult(requestCode, resultCode, intent);
     }
@@ -166,7 +166,9 @@ public class NewPostActivity extends AppCompatActivity {
         values.put(Posts.PostEntry.COLUMN_NAME_TITLE, titleText.getText().toString());
         values.put(Posts.PostEntry.COLUMN_NAME_DESCRIPTION, descText.getText().toString());
         values.put(Posts.PostEntry.COLUMN_NAME_PRICE, priceText.getText().toString());
-        values.put(Posts.PostEntry.COLUMN_NAME_PHOTO, photoURI.getEncodedPath().toString());
+
+        // this prevents addition of a new post. FIX
+        /*values.put(Posts.PostEntry.COLUMN_NAME_PHOTO, photoURI.getEncodedPath().toString());*/
 
         // camera support
         /* dispatchTakePictureIntent(); */
