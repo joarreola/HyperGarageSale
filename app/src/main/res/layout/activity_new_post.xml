@@ -48,7 +48,7 @@
         android:paddingTop="@dimen/activity_vertical_margin"
         android:hint="@string/desc_hint"
         android:id="@+id/textView_desc" />
-
+<!--
     <Button
         android:id="@+id/cameraButton"
         android:layout_width="wrap_content"
@@ -57,19 +57,26 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
-    <!--
+        -->
+
         <RelativeLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content">
 
+            <!--
+            android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+            -->
+
             <ImageView
                 android:id="@+id/CameraImageView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:layout_marginEnd="49dp"
                 android:layout_marginRight="49dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="8dp"
                 app:srcCompat="@android:drawable/picture_frame" />
 
         <Button
@@ -82,7 +89,7 @@
             android:layout_alignParentStart="true" />
 
     </RelativeLayout>
-    -->
+
 </LinearLayout>
 
 </android.support.design.widget.CoordinatorLayout>
