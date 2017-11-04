@@ -1,5 +1,7 @@
 package com.ucsc.taiyo.hypergaragesale;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -74,6 +76,7 @@ public class BrowsePostsActivity extends AppCompatActivity {
         String[] projection = {
                 Posts.PostEntry.COLUMN_NAME_TITLE,
                 Posts.PostEntry.COLUMN_NAME_PRICE,
+                Posts.PostEntry.COLUMN_NAME_PHOTO,
         };
 
         // How you want the results sorted in the resulting Cursor
@@ -91,11 +94,25 @@ public class BrowsePostsActivity extends AppCompatActivity {
         );
 
         ArrayList<BrowsePosts> browsePosts = new ArrayList<>();
+        /* original
         if (cursor.moveToFirst()) {
             do {
                 browsePosts.add(new BrowsePosts(
                         cursor.getString(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_TITLE)),
                         cursor.getString(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_PRICE))));
+            } while (cursor.moveToNext());
+        }
+        */
+        if (cursor.moveToFirst()) {
+            do {
+                byte[] imgByte = cursor.getBlob(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_PHOTO));
+                Bitmap imgBitmap = BitmapFactory.decodeByteArray(imgByte, 0, imgByte.length);
+                browsePosts.add(
+                        new BrowsePosts(
+                        cursor.getString(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_TITLE)),
+                        cursor.getString(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_PRICE)),
+                                imgBitmap)
+                );
             } while (cursor.moveToNext());
         }
 

@@ -2,6 +2,7 @@ package com.ucsc.taiyo.hypergaragesale;
 
 import android.content.ContentResolver;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -23,6 +24,7 @@ import android.widget.EditText;
 import android.content.Intent;
 import android.widget.ImageView;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -39,9 +41,10 @@ public class NewPostActivity extends AppCompatActivity {
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
     static final int REQUEST_TAKE_PHOTO = 2;
-    //ImageView mImageView;
+    ImageView mImageView;
     String mCurrentPhotoPath;
     Uri photoURI;
+    byte[] byteArray;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +63,7 @@ public class NewPostActivity extends AppCompatActivity {
         titleText = (EditText)findViewById(R.id.textView_title);
         descText = (EditText)findViewById(R.id.textView_desc);
         priceText = (EditText)findViewById(R.id.textView_price);
-        //mImageView = (ImageView) findViewById(R.id.CameraImageView);
+        mImageView = (ImageView) findViewById(R.id.CameraImageView);
 
         // Gets the data repository in write mode
         PostsDbHelper mDbHelper = new PostsDbHelper(this);
@@ -97,9 +100,8 @@ public class NewPostActivity extends AppCompatActivity {
                                 "com.ucsc.taiyo.hypergaragesale.android.fileprovider",
                                 photoFile);
                         takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                        startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+                        startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
                     }
-
                 }
             }
         });
@@ -113,7 +115,7 @@ public class NewPostActivity extends AppCompatActivity {
         }
          */
     }
-/*
+
     public void grabImage(ImageView mImageView)
     {
         this.getContentResolver().notifyChange(photoURI, null);
@@ -122,25 +124,41 @@ public class NewPostActivity extends AppCompatActivity {
         try
         {
             bitmap = android.provider.MediaStore.Images.Media.getBitmap(cr, photoURI);
+
+            // bitmap to byteArray
+            byteArray = getBitmapAsByteArray(bitmap);
+
             mImageView.setImageBitmap(bitmap);
         }
         catch (Exception e)
         {
             //Toast.makeText(this, "Failed to load", Toast.LENGTH_SHORT).show();
             //Log.d(TAG, "Failed to load", e);
-            Log.e("Failed to access photoURI", e.getMessage());
+            Log.e("Failed photoURI", e.getMessage());
         }
+        /*
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        //BitmapFactory.decodeResource(getResources(), R.id.myimage, options);
+
+        //BitmapFactory.decodeResource(getResources(), R.id.CameraImageView, options);
+        BitmapFactory.decodeFile(photoURI.getPath().toString());
+
+        int imageHeight = options.outHeight;
+        int imageWidth = options.outWidth;
+        String imageType = options.outMimeType;
+        */
     }
-*/
+
     // view thumbnail from camera activity: REQUEST_IMAGE_CAPTURE
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         //if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+        if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
             //Bundle extras = data.getExtras();
             //Bitmap imageBitmap = (Bitmap) extras.get("data");
             //mImageView.setImageBitmap(imageBitmap);
-            //grabImage(mImageView);
+            grabImage(mImageView);
         }
         super.onActivityResult(requestCode, resultCode, intent);
     }
@@ -167,8 +185,7 @@ public class NewPostActivity extends AppCompatActivity {
         values.put(Posts.PostEntry.COLUMN_NAME_DESCRIPTION, descText.getText().toString());
         values.put(Posts.PostEntry.COLUMN_NAME_PRICE, priceText.getText().toString());
 
-        // this prevents addition of a new post. FIX
-        /*values.put(Posts.PostEntry.COLUMN_NAME_PHOTO, photoURI.getEncodedPath().toString());*/
+        values.put(Posts.PostEntry.COLUMN_NAME_PHOTO, byteArray);
 
         // camera support
         /* dispatchTakePictureIntent(); */
@@ -214,5 +231,11 @@ public class NewPostActivity extends AppCompatActivity {
         // Save a file: path for use with ACTION_VIEW intents
         mCurrentPhotoPath = image.getAbsolutePath();
         return image;
+    }
+
+    public static byte[] getBitmapAsByteArray(Bitmap bitmap) {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+        return outputStream.toByteArray();
     }
 }

@@ -1,11 +1,18 @@
 package com.ucsc.taiyo.hypergaragesale;
 
+import android.content.Intent;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import java.util.ArrayList;
+
+import static android.support.v4.content.ContextCompat.startActivity;
 
 /**
  * Created by taiyo on 6/5/17.
@@ -22,11 +29,21 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         // each data item is just a string in this case
         public TextView mTitle;
         public TextView mPrice;
+
+        //
+        public ImageView mPhoto;
+
         public ViewHolder(View view) {
             super(view);
             mTitle = (TextView) itemView.findViewById(R.id.titleView);
             mPrice = (TextView) itemView.findViewById(R.id.priceView);
-            // Implement view click Listener when make each row of RecycleView clickable
+
+            //
+            mPhoto = (ImageView) itemView.findViewById(R.id.ListCameraImageView);
+
+
+            // Implement view click Listener when make each row of RecyclerView clickable
+
         }
     }
 
@@ -57,6 +74,9 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         // - replace the contents of the views with that elements
         holder.mTitle.setText(mDataset.get(position).mTitle);
         holder.mPrice.setText(mDataset.get(position).mPrice);
+
+        //
+        holder.mPhoto.setImageBitmap(mDataset.get(position).mPhoto);
     }
 
     // Return the size of your dataset (invoked by the layout manager)
