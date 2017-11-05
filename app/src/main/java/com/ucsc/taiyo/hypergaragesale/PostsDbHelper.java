@@ -12,7 +12,7 @@ public class PostsDbHelper extends SQLiteOpenHelper {
 
     // If you change the database schema, you must increment the database version.
     public static final int DATABASE_VERSION = 1;
-    public static final String DATABASE_NAME = "Posts.db4";
+    public static final String DATABASE_NAME = "Posts.db7";
 
     private static final String TEXT_TYPE = " TEXT";
     private static final String COMMA_SEP = ",";
@@ -23,7 +23,7 @@ public class PostsDbHelper extends SQLiteOpenHelper {
                     Posts.PostEntry.COLUMN_NAME_DESCRIPTION + TEXT_TYPE + COMMA_SEP +
                     Posts.PostEntry.COLUMN_NAME_PRICE + TEXT_TYPE + COMMA_SEP +
                     Posts.PostEntry.COLUMN_NAME_PHOTO +
-                    " BLOB);";
+                    " TEXT_TYPE);";
 
     private static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS " + Posts.PostEntry.TABLE_NAME;

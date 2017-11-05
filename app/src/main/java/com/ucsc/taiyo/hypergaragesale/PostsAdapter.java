@@ -37,10 +37,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             super(view);
             mTitle = (TextView) itemView.findViewById(R.id.titleView);
             mPrice = (TextView) itemView.findViewById(R.id.priceView);
-
-            //
             mPhoto = (ImageView) itemView.findViewById(R.id.ListCameraImageView);
-
 
             // Implement view click Listener when make each row of RecyclerView clickable
 
@@ -60,6 +57,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         // create a new view
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.post_text_view, parent, false);
+
         // set the view's size, margins, paddings and layout parameters
 
         ViewHolder vh = new ViewHolder(v);
@@ -74,8 +72,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         // - replace the contents of the views with that elements
         holder.mTitle.setText(mDataset.get(position).mTitle);
         holder.mPrice.setText(mDataset.get(position).mPrice);
-
-        //
         holder.mPhoto.setImageBitmap(mDataset.get(position).mPhoto);
     }
 

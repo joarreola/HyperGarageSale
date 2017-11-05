@@ -184,8 +184,7 @@ public class NewPostActivity extends AppCompatActivity {
         values.put(Posts.PostEntry.COLUMN_NAME_TITLE, titleText.getText().toString());
         values.put(Posts.PostEntry.COLUMN_NAME_DESCRIPTION, descText.getText().toString());
         values.put(Posts.PostEntry.COLUMN_NAME_PRICE, priceText.getText().toString());
-
-        values.put(Posts.PostEntry.COLUMN_NAME_PHOTO, byteArray);
+        values.put(Posts.PostEntry.COLUMN_NAME_PHOTO, mCurrentPhotoPath);
 
         // camera support
         /* dispatchTakePictureIntent(); */

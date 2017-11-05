@@ -1,6 +1,7 @@
 package com.ucsc.taiyo.hypergaragesale;
 
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.provider.BaseColumns;
 
 /**
@@ -18,7 +19,6 @@ public class Posts {
         public static final String COLUMN_NAME_TITLE = "title";
         public static final String COLUMN_NAME_DESCRIPTION = "description";
         public static final String COLUMN_NAME_PRICE = "price";
-
         public static final String COLUMN_NAME_PHOTO = "photo";
 
     }

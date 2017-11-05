@@ -1,19 +1,26 @@
 package com.ucsc.taiyo.hypergaragesale;
 
+import android.content.ContentResolver;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.LinearLayoutManager;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.Cursor;
+import java.io.File;
 
 /**
  * Created by taiyo on 6/5/17.
@@ -105,14 +112,31 @@ public class BrowsePostsActivity extends AppCompatActivity {
         */
         if (cursor.moveToFirst()) {
             do {
-                byte[] imgByte = cursor.getBlob(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_PHOTO));
-                Bitmap imgBitmap = BitmapFactory.decodeByteArray(imgByte, 0, imgByte.length);
+                //byte[] imgByte = cursor.getBlob(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_PHOTO));
+                //Bitmap imgBitmap = BitmapFactory.decodeByteArray(imgByte, 0, imgByte.length);
+
+                String photoPathString = cursor.getString(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_PHOTO));
+                Uri photoURI = Uri.fromFile(new File(photoPathString));
+                this.getContentResolver().notifyChange(photoURI, null);
+                ContentResolver cr = this.getContentResolver();
+
+                Bitmap imgBitmap = null;
+                try
+                {
+                    imgBitmap = android.provider.MediaStore.Images.Media.getBitmap(cr, photoURI);
+                }
+                catch (Exception e)
+                {
+                    Log.e("Failed photoURI", e.getMessage());
+                }
+
                 browsePosts.add(
                         new BrowsePosts(
                         cursor.getString(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_TITLE)),
                         cursor.getString(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_PRICE)),
                                 imgBitmap)
                 );
+
             } while (cursor.moveToNext());
         }
 
