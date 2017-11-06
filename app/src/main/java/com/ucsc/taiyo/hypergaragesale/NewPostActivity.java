@@ -120,15 +120,18 @@ public class NewPostActivity extends AppCompatActivity {
     {
         this.getContentResolver().notifyChange(photoURI, null);
         ContentResolver cr = this.getContentResolver();
-        Bitmap bitmap;
+        Bitmap bitmap = null;
         try
         {
-            bitmap = android.provider.MediaStore.Images.Media.getBitmap(cr, photoURI);
+            //bitmap = android.provider.MediaStore.Images.Media.getBitmap(cr, photoURI);
+            bitmap =  new BitmapFactoryUtilities().decodeSampledBitmapFromFile(mCurrentPhotoPath,  500, 500);
 
             // bitmap to byteArray
-            byteArray = getBitmapAsByteArray(bitmap);
+            //byteArray = getBitmapAsByteArray(bitmap);
 
+            //mImageView.setImageBitmap(bitmap);
             mImageView.setImageBitmap(bitmap);
+
         }
         catch (Exception e)
         {
@@ -136,18 +139,7 @@ public class NewPostActivity extends AppCompatActivity {
             //Log.d(TAG, "Failed to load", e);
             Log.e("Failed photoURI", e.getMessage());
         }
-        /*
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        //BitmapFactory.decodeResource(getResources(), R.id.myimage, options);
 
-        //BitmapFactory.decodeResource(getResources(), R.id.CameraImageView, options);
-        BitmapFactory.decodeFile(photoURI.getPath().toString());
-
-        int imageHeight = options.outHeight;
-        int imageWidth = options.outWidth;
-        String imageType = options.outMimeType;
-        */
     }
 
     // view thumbnail from camera activity: REQUEST_IMAGE_CAPTURE
@@ -231,10 +223,12 @@ public class NewPostActivity extends AppCompatActivity {
         mCurrentPhotoPath = image.getAbsolutePath();
         return image;
     }
-
+    /*
     public static byte[] getBitmapAsByteArray(Bitmap bitmap) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
         return outputStream.toByteArray();
     }
+    */
+
 }

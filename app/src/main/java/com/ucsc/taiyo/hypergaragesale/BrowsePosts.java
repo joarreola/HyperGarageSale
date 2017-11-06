@@ -12,7 +12,6 @@ public class BrowsePosts {
     public Bitmap mPhoto;
 
     public BrowsePosts (String title, String price, Bitmap photo) {
-    //public BrowsePosts (String title, String price) {
         this.mTitle = title;
         this.mPrice = price;
         this.mPhoto = photo;

@@ -111,19 +111,24 @@ public class BrowsePostsActivity extends AppCompatActivity {
         }
         */
         if (cursor.moveToFirst()) {
+            //
+            BitmapFactoryUtilities bitmapUtils = new BitmapFactoryUtilities();
+
             do {
                 //byte[] imgByte = cursor.getBlob(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_PHOTO));
                 //Bitmap imgBitmap = BitmapFactory.decodeByteArray(imgByte, 0, imgByte.length);
 
                 String photoPathString = cursor.getString(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_PHOTO));
-                Uri photoURI = Uri.fromFile(new File(photoPathString));
-                this.getContentResolver().notifyChange(photoURI, null);
-                ContentResolver cr = this.getContentResolver();
-
                 Bitmap imgBitmap = null;
                 try
                 {
+                    /*
+                    Uri photoURI = Uri.fromFile(new File(photoPathString));
+                    this.getContentResolver().notifyChange(photoURI, null);
+                    ContentResolver cr = this.getContentResolver();
                     imgBitmap = android.provider.MediaStore.Images.Media.getBitmap(cr, photoURI);
+                    */
+                    imgBitmap =  bitmapUtils.decodeSampledBitmapFromFile(photoPathString,  100, 100);
                 }
                 catch (Exception e)
                 {
@@ -142,4 +147,5 @@ public class BrowsePostsActivity extends AppCompatActivity {
 
         return browsePosts;
     }
+
 }
