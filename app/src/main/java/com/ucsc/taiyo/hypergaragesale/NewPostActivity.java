@@ -124,13 +124,13 @@ public class NewPostActivity extends AppCompatActivity {
         try
         {
             //bitmap = android.provider.MediaStore.Images.Media.getBitmap(cr, photoURI);
-            bitmap =  new BitmapFactoryUtilities().decodeSampledBitmapFromFile(mCurrentPhotoPath,  500, 500);
+            //bitmap =  new BitmapFactoryUtilities().decodeSampledBitmapFromFile(mCurrentPhotoPath,  500, 500);
 
             // bitmap to byteArray
             //byteArray = getBitmapAsByteArray(bitmap);
 
-            //mImageView.setImageBitmap(bitmap);
-            mImageView.setImageBitmap(bitmap);
+            // load image in background
+            loadBitmap(mImageView, 500, 500);
 
         }
         catch (Exception e)
@@ -150,6 +150,7 @@ public class NewPostActivity extends AppCompatActivity {
             //Bundle extras = data.getExtras();
             //Bitmap imageBitmap = (Bitmap) extras.get("data");
             //mImageView.setImageBitmap(imageBitmap);
+
             grabImage(mImageView);
         }
         super.onActivityResult(requestCode, resultCode, intent);
@@ -231,4 +232,10 @@ public class NewPostActivity extends AppCompatActivity {
     }
     */
 
+    public void loadBitmap(ImageView imageView, int reqHeight, int reqWidth) {
+
+        BitmapWorkerTask task = new BitmapWorkerTask(imageView, reqHeight, reqWidth);
+
+        task.execute(mCurrentPhotoPath);
+    }
 }

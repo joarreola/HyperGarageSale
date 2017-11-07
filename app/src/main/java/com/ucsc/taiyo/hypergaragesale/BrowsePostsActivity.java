@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.Cursor;
+import android.widget.ImageView;
+
 import java.io.File;
 
 /**
@@ -55,6 +57,7 @@ public class BrowsePostsActivity extends AppCompatActivity {
         PostsDbHelper mDbHelper = new PostsDbHelper(this);
         db = mDbHelper.getReadableDatabase();
 
+        // Get bitmap via AsyncTask in PostsAdapter
         mAdapter = new PostsAdapter(getDataSet());
         mRecyclerView.setAdapter(mAdapter);
 
@@ -101,15 +104,7 @@ public class BrowsePostsActivity extends AppCompatActivity {
         );
 
         ArrayList<BrowsePosts> browsePosts = new ArrayList<>();
-        /* original
-        if (cursor.moveToFirst()) {
-            do {
-                browsePosts.add(new BrowsePosts(
-                        cursor.getString(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_TITLE)),
-                        cursor.getString(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_PRICE))));
-            } while (cursor.moveToNext());
-        }
-        */
+
         if (cursor.moveToFirst()) {
             //
             BitmapFactoryUtilities bitmapUtils = new BitmapFactoryUtilities();
@@ -117,29 +112,32 @@ public class BrowsePostsActivity extends AppCompatActivity {
             do {
                 //byte[] imgByte = cursor.getBlob(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_PHOTO));
                 //Bitmap imgBitmap = BitmapFactory.decodeByteArray(imgByte, 0, imgByte.length);
-
+            /*
                 String photoPathString = cursor.getString(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_PHOTO));
                 Bitmap imgBitmap = null;
                 try
                 {
-                    /*
+
+                    // get full-size image, downsample
                     Uri photoURI = Uri.fromFile(new File(photoPathString));
                     this.getContentResolver().notifyChange(photoURI, null);
                     ContentResolver cr = this.getContentResolver();
                     imgBitmap = android.provider.MediaStore.Images.Media.getBitmap(cr, photoURI);
-                    */
-                    imgBitmap =  bitmapUtils.decodeSampledBitmapFromFile(photoPathString,  100, 100);
+
+
+                    //imgBitmap =  bitmapUtils.decodeSampledBitmapFromFile(photoPathString,  100, 100);
+
                 }
                 catch (Exception e)
                 {
                     Log.e("Failed photoURI", e.getMessage());
                 }
+            */
 
-                browsePosts.add(
-                        new BrowsePosts(
+                browsePosts.add( new BrowsePosts(
                         cursor.getString(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_TITLE)),
                         cursor.getString(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_PRICE)),
-                                imgBitmap)
+                        cursor.getString(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_PHOTO)))
                 );
 
             } while (cursor.moveToNext());

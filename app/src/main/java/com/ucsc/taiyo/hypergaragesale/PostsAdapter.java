@@ -29,8 +29,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         // each data item is just a string in this case
         public TextView mTitle;
         public TextView mPrice;
-
-        //
         public ImageView mPhoto;
 
         public ViewHolder(View view) {
@@ -72,7 +70,17 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         // - replace the contents of the views with that elements
         holder.mTitle.setText(mDataset.get(position).mTitle);
         holder.mPrice.setText(mDataset.get(position).mPrice);
-        holder.mPhoto.setImageBitmap(mDataset.get(position).mPhoto);
+
+        // extract bitmap here in background
+        //holder.mPhoto.setImageBitmap(mDataset.get(position).mPhoto);
+
+        // get string path from mDataset
+        String photoPathString = mDataset.get(position).mPhoto;
+
+        // do BitmapFactory work in AsyncTask
+        BitmapWorkerTask task = new BitmapWorkerTask(holder.mPhoto, 100, 100);
+        task.execute(photoPathString);
+
     }
 
     // Return the size of your dataset (invoked by the layout manager)
