@@ -1,6 +1,8 @@
 package com.ucsc.taiyo.hypergaragesale;
 
+import android.app.ActivityManager;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -10,6 +12,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.util.LruCache;
 import android.view.View;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
@@ -33,6 +36,7 @@ public class BrowsePostsActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
+    private LruCache mMemoryCache;
 
     private SQLiteDatabase db;
 
@@ -71,6 +75,37 @@ public class BrowsePostsActivity extends AppCompatActivity {
                 startActivity(new Intent(getApplicationContext(), NewPostActivity.class));
             }
         });
+
+        /**
+         * Setup LruCache
+         */
+        // Get memory class of this device, exceeding this amount will throw an  OutOfMemory exception
+        final int memClass =
+                ((ActivityManager)
+                        getApplicationContext().getSystemService(Context.ACTIVITY_SERVICE)).getMemoryClass();
+
+        // Use 1/8th of the available memory for this memory cache.
+        final int cacheSize = 1024 * 1024 * memClass / 8;
+
+        /*
+        mMemoryCache = new LruCache(cacheSize) {
+
+            @Override
+            protected int sizeOf(String key, Bitmap bitmap) {
+                // The cache size will be measured in bytes rather than number of items.
+
+                return bitmap.getByteCount();
+
+            }
+        };
+        */
+
+        //LruCache<String, Bitmap> mMemoryCache = new LruCache<String, Bitmap>(cacheSize) {
+        mMemoryCache = new LruCache<String, Bitmap>(cacheSize) {
+            protected int sizeOf(String key, Bitmap bitmap) {
+                return bitmap.getByteCount();
+            }
+        };
     }
 
     @Override
@@ -146,4 +181,14 @@ public class BrowsePostsActivity extends AppCompatActivity {
         return browsePosts;
     }
 
+    public void addBitmapToMemoryCache(String key, Bitmap bitmap) {
+        if (getBitmapFromMemCache(key) == null) {
+            mMemoryCache.put(key, bitmap);
+        }
+    }
+
+    public Bitmap getBitmapFromMemCache(String key) {
+
+        return (Bitmap) mMemoryCache.get(key);
+    }
 }
