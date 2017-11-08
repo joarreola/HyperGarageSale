@@ -36,7 +36,7 @@ public class BrowsePostsActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
-    private LruCache mMemoryCache;
+    static public LruCache mMemoryCache;
 
     private SQLiteDatabase db;
 
@@ -181,14 +181,4 @@ public class BrowsePostsActivity extends AppCompatActivity {
         return browsePosts;
     }
 
-    public void addBitmapToMemoryCache(String key, Bitmap bitmap) {
-        if (getBitmapFromMemCache(key) == null) {
-            mMemoryCache.put(key, bitmap);
-        }
-    }
-
-    public Bitmap getBitmapFromMemCache(String key) {
-
-        return (Bitmap) mMemoryCache.get(key);
-    }
 }

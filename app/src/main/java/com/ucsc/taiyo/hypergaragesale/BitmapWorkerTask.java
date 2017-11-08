@@ -1,7 +1,6 @@
 package com.ucsc.taiyo.hypergaragesale;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.widget.ImageView;
 import java.lang.ref.WeakReference;
 import android.os.AsyncTask;
@@ -28,7 +27,12 @@ public class BitmapWorkerTask extends AsyncTask<String, Void, Bitmap> {
     protected Bitmap doInBackground(String... params) {
         File = params[0];
 
-        return new BitmapFactoryUtilities().decodeSampledBitmapFromFile(File, reqHeight, reqHeight);
+        final Bitmap bitmap =
+                new BitmapFactoryUtilities().decodeSampledBitmapFromFile(File, reqHeight, reqHeight);
+
+        addBitmapToMemoryCache(String.valueOf(params[0]), bitmap);
+
+        return bitmap;
     }
 
     // Once complete, see if ImageView is still around and set bitmap.
@@ -42,4 +46,21 @@ public class BitmapWorkerTask extends AsyncTask<String, Void, Bitmap> {
         }
     }
 
+    public synchronized void addBitmapToMemoryCache(String key, Bitmap bitmap) {
+        if (getBitmapFromMemCache(key) == null) {
+
+            BrowsePostsActivity.mMemoryCache.put(key, bitmap);
+
+            //Bitmap gotBitmap = getBitmapFromMemCache(key);
+
+            //gotBitmap = getBitmapFromMemCache(key);
+        }
+    }
+
+    public Bitmap getBitmapFromMemCache(String key) {
+
+        //BrowsePostsActivity.mMemoryCache.get(key);
+
+        return (Bitmap) BrowsePostsActivity.mMemoryCache.get(key);
+    }
 }

@@ -1,9 +1,11 @@
 package com.ucsc.taiyo.hypergaragesale;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
+import android.util.LruCache;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +23,7 @@ import static android.support.v4.content.ContextCompat.startActivity;
 public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
 
     private ArrayList<BrowsePosts> mDataset;
+    //static public LruCache mMemoryCache;
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -43,9 +46,11 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
+    //public PostsAdapter(ArrayList<BrowsePosts> myDataset, LruCache mMemoryCache) {
     public PostsAdapter(ArrayList<BrowsePosts> myDataset) {
 
         mDataset = myDataset;
+        //this.mMemoryCache = mMemoryCache;
     }
 
     // Create new views (invoked by the layout manager)
@@ -78,8 +83,15 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         String photoPathString = mDataset.get(position).mPhoto;
 
         // do BitmapFactory work in AsyncTask
+        /*
         BitmapWorkerTask task = new BitmapWorkerTask(holder.mPhoto, 100, 100);
         task.execute(photoPathString);
+        */
+
+        /**
+         * photoPathString: use as Mem Cache image key.
+         */
+        loadBitmap(photoPathString, holder.mPhoto, 100, 100);
 
     }
 
@@ -89,4 +101,54 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         return mDataset.size();
     }
 
+    /**
+     *
+     * Memory Caching Code
+     */
+
+    public void addBitmapToMemoryCache(String key, Bitmap bitmap) {
+        if (getBitmapFromMemCache(key) == null) {
+            BrowsePostsActivity.mMemoryCache.put(key, bitmap);
+        }
+    }
+
+    public Bitmap getBitmapFromMemCache(String key) {
+
+        return (Bitmap) BrowsePostsActivity.mMemoryCache.get(key);
+    }
+
+    /*
+    public void loadBitmap(ImageView imageView, int reqHeight, int reqWidth) {
+
+        BitmapWorkerTask task = new BitmapWorkerTask(imageView, reqHeight, reqWidth);
+
+        task.execute(mCurrentPhotoPath);
+    }
+     */
+
+    //loadBitmap(photoPathString, holder.mPhoto, 100, 100);
+    //public void loadBitmap(int resId, ImageView imageView) {
+    public void loadBitmap(String photoPathString, ImageView imageView, int reqHeight, int reqWidth) {
+
+        //final String imageKey = String.valueOf(resId);
+
+        final Bitmap bitmap = getBitmapFromMemCache(photoPathString);
+
+        if (bitmap != null) {
+
+            imageView.setImageBitmap(bitmap);
+
+        } else {
+
+            //imageView.setImageResource(R.drawable.image_placeholder);
+
+            //BitmapWorkerTask task = new BitmapWorkerTask(holder.mPhoto, 100, 100);
+            //task.execute(photoPathString);
+
+            BitmapWorkerTask task = new BitmapWorkerTask(imageView, 100, 100);
+
+            task.execute(photoPathString);
+        }
+
+    }
 }

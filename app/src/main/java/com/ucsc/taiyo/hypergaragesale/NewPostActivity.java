@@ -50,6 +50,8 @@ public class NewPostActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_post);
+
+        // Toolbar for back to BrowseActivity (<-) and Add a new post
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
         ActionBar actionBar = getSupportActionBar();
@@ -60,6 +62,7 @@ public class NewPostActivity extends AppCompatActivity {
             Log.e("setDisplayHomeAsUpEnabl", ex.getMessage());
         }
 
+        // Views that take user input
         titleText = (EditText)findViewById(R.id.textView_title);
         descText = (EditText)findViewById(R.id.textView_desc);
         priceText = (EditText)findViewById(R.id.textView_price);
@@ -87,7 +90,9 @@ public class NewPostActivity extends AppCompatActivity {
                     // Create the File where the photo should go
                     File photoFile = null;
                     try {
+
                         photoFile = createImageFile();
+
                     } catch (IOException ex) {
                         Log.e("createImageFile failed", ex.getMessage());
                     }
@@ -102,6 +107,8 @@ public class NewPostActivity extends AppCompatActivity {
                         takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                         startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
                     }
+
+                    // TODO: do I need to explicitely get back to NewPostActivity?
                 }
             }
         });
@@ -130,6 +137,7 @@ public class NewPostActivity extends AppCompatActivity {
             //byteArray = getBitmapAsByteArray(bitmap);
 
             // load image in background
+            // TODO: set size in layout xml
             loadBitmap(mImageView, 500, 500);
 
         }
@@ -190,21 +198,24 @@ public class NewPostActivity extends AppCompatActivity {
                 values);
 
         // Done adding new entry into database, navigate user back to browsing screen
-        startActivity(new Intent(this, BrowsePostsActivity.class));
+        // TODO: GO back to Browsing Posts after a single entry? Use <- instead.
+        //startActivity(new Intent(this, BrowsePostsActivity.class));
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.new_post_menu, menu);
+
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_new_post) {
-            showSnackBar(null);
+            //showSnackBar(null);
             addPost();
+            showSnackBar(null);
         }
         return super.onOptionsItemSelected(item);
     }
