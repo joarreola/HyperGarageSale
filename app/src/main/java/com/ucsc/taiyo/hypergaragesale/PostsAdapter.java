@@ -117,17 +117,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         return (Bitmap) BrowsePostsActivity.mMemoryCache.get(key);
     }
 
-    /*
-    public void loadBitmap(ImageView imageView, int reqHeight, int reqWidth) {
-
-        BitmapWorkerTask task = new BitmapWorkerTask(imageView, reqHeight, reqWidth);
-
-        task.execute(mCurrentPhotoPath);
-    }
-     */
-
-    //loadBitmap(photoPathString, holder.mPhoto, 100, 100);
-    //public void loadBitmap(int resId, ImageView imageView) {
     public void loadBitmap(String photoPathString, ImageView imageView, int reqHeight, int reqWidth) {
 
         //final String imageKey = String.valueOf(resId);

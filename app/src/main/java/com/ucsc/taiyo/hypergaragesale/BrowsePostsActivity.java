@@ -1,12 +1,10 @@
 package com.ucsc.taiyo.hypergaragesale;
 
 import android.app.ActivityManager;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -18,14 +16,12 @@ import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.LinearLayoutManager;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.Cursor;
-import android.widget.ImageView;
 
 import java.io.File;
+import com.jakewharton.disklrucache.*;
 
 /**
  * Created by taiyo on 6/5/17.
@@ -37,6 +33,9 @@ public class BrowsePostsActivity extends AppCompatActivity {
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     static public LruCache mMemoryCache;
+    static public DiskLruCache mDiskCache;
+    private static final int DISK_CACHE_SIZE = 1024 * 1024 * 10; // 10MB
+    private static final String DISK_CACHE_SUBDIR = "thumbnails";
 
     private SQLiteDatabase db;
 
@@ -87,25 +86,26 @@ public class BrowsePostsActivity extends AppCompatActivity {
         // Use 1/8th of the available memory for this memory cache.
         final int cacheSize = 1024 * 1024 * memClass / 8;
 
-        /*
-        mMemoryCache = new LruCache(cacheSize) {
-
-            @Override
-            protected int sizeOf(String key, Bitmap bitmap) {
-                // The cache size will be measured in bytes rather than number of items.
-
-                return bitmap.getByteCount();
-
-            }
-        };
-        */
-
         //LruCache<String, Bitmap> mMemoryCache = new LruCache<String, Bitmap>(cacheSize) {
         mMemoryCache = new LruCache<String, Bitmap>(cacheSize) {
             protected int sizeOf(String key, Bitmap bitmap) {
                 return bitmap.getByteCount();
             }
         };
+
+        /**
+         *  Initialize DiskLruCache
+         */
+        File cacheDir = getCacheDir(this, DISK_CACHE_SUBDIR);
+
+        //mDiskCache = DiskLruCache.openCache(this, cacheDir, DISK_CACHE_SIZE);
+        try {
+            mDiskCache = DiskLruCache.open(cacheDir, 1, 1, DISK_CACHE_SIZE);
+        }
+        catch (Exception e)
+        {
+            Log.e("DiskLruCache.open", e.getMessage());
+        }
     }
 
     @Override
@@ -179,6 +179,18 @@ public class BrowsePostsActivity extends AppCompatActivity {
         }
 
         return browsePosts;
+    }
+
+    // Creates a unique subdirectory of the designated app cache directory. Tries to use external
+    // but if not mounted, falls back on internal storage.
+    public static File getCacheDir(Context context, String uniqueName) {
+        // Check if media is mounted or storage is built-in, if so, try and use external cache dir
+        // otherwise use internal cache dir
+        final String cachePath = Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED
+                || !Environment.isExternalStorageRemovable() ?
+                context.getExternalCacheDir().getPath() : context.getCacheDir().getPath();
+
+        return new File(cachePath + File.separator + uniqueName);
     }
 
 }
