@@ -100,7 +100,7 @@ public class BitmapWorkerTask extends AsyncTask<String, Void, Bitmap> {
             BrowsePostsActivity.mMemoryCache.put(data, bitmap);
         }
 
-        synchronized (mDiskCacheLock) {
+        //synchronized (mDiskCacheLock) {
             // Add to disk cache
             if (BrowsePostsActivity.mDiskCache != null) {
                 final String key = hashKeyForDisk(data);
@@ -132,7 +132,7 @@ public class BitmapWorkerTask extends AsyncTask<String, Void, Bitmap> {
                     } catch (IOException e) {}
                 }
             }
-        }
+        //}
     }
 
     /**
@@ -145,7 +145,7 @@ public class BitmapWorkerTask extends AsyncTask<String, Void, Bitmap> {
         final String key = hashKeyForDisk(data);
         Bitmap bitmap = null;
 
-        synchronized (mDiskCacheLock) {
+        //synchronized (mDiskCacheLock) {
             /* getting stuck here
             while (mDiskCacheStarting) {
                 try {
@@ -186,7 +186,7 @@ public class BitmapWorkerTask extends AsyncTask<String, Void, Bitmap> {
                 }
             }
             return bitmap;
-        }
+        //}
     }
 
 
