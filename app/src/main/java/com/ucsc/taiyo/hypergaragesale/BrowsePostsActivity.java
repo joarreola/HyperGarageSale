@@ -142,7 +142,7 @@ public class BrowsePostsActivity extends AppCompatActivity {
 
         if (cursor.moveToFirst()) {
             //
-            BitmapFactoryUtilities bitmapUtils = new BitmapFactoryUtilities();
+            //BitmapFactoryUtilities bitmapUtils = new BitmapFactoryUtilities();
 
             do {
                 //byte[] imgByte = cursor.getBlob(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_PHOTO));

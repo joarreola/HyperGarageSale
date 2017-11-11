@@ -193,8 +193,6 @@ public class BitmapWorkerTask extends AsyncTask<String, Void, Bitmap> {
 
     public Bitmap getBitmapFromMemCache(String key) {
 
-        //BrowsePostsActivity.mMemoryCache.get(key);
-
         return (Bitmap) BrowsePostsActivity.mMemoryCache.get(key);
     }
 

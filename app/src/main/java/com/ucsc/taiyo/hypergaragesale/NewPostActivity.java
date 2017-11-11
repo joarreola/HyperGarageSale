@@ -3,6 +3,7 @@ package com.ucsc.taiyo.hypergaragesale;
 import android.Manifest;
 import android.content.ContentResolver;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -27,6 +28,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.content.Intent;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -45,16 +47,19 @@ public class NewPostActivity extends AppCompatActivity {
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
     static final int REQUEST_TAKE_PHOTO = 2;
+    static final int RESULT_LOAD_IMAGE = 3;
     static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 1;
     ImageView mImageView;
     String mCurrentPhotoPath;
     Uri photoURI;
     byte[] byteArray;
+    Boolean fromGallery;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_post);
+        fromGallery = false;
 
         // Toolbar for back to BrowseActivity (<-) and Add a new post
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
@@ -78,7 +83,6 @@ public class NewPostActivity extends AppCompatActivity {
         db = mDbHelper.getWritableDatabase();
 
         // camera intent button
-        //FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.camerafab);
         Button cButton = (Button) findViewById(R.id.cameraButton);
 
         cButton.setOnClickListener(new View.OnClickListener() {
@@ -121,6 +125,26 @@ public class NewPostActivity extends AppCompatActivity {
             }
         });
 
+        // gallery intent button
+        Button gButton = (Button) findViewById(R.id.galleryButton);
+
+        gButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                 try{
+                     Intent galleryIntet = new Intent(Intent.ACTION_PICK,
+                             android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                     startActivityForResult(galleryIntet, RESULT_LOAD_IMAGE);
+
+                }catch(Exception exp){
+                    Log.i("Error",exp.toString());
+                }
+
+                // TODO: do I need to explicitly get back to NewPostActivity?
+            }
+        });
+
         /*
         private void dispatchTakePictureIntent() {
             Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -159,15 +183,64 @@ public class NewPostActivity extends AppCompatActivity {
     // view thumbnail from camera activity: REQUEST_IMAGE_CAPTURE
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+
         //if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+
+        // from camera
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
             //Bundle extras = data.getExtras();
             //Bitmap imageBitmap = (Bitmap) extras.get("data");
             //mImageView.setImageBitmap(imageBitmap);
 
             grabImage(mImageView);
+
+            fromGallery = false;
         }
-        super.onActivityResult(requestCode, resultCode, intent);
+
+        // from gallery
+        if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && null != intent) {
+            Uri selectedImage = intent.getData();
+            String[] filePathColumn = { MediaStore.Images.Media.DATA };
+
+            Cursor cursor = getContentResolver().query(selectedImage,
+                    filePathColumn, null, null, null);
+            cursor.moveToFirst();
+
+            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+            String picturePath = cursor.getString(columnIndex);
+            cursor.close();
+
+            /*
+            Bitmap bmp;
+            bmp = BitmapFactoryUtilities.decodeSampledBitmapFromFile(picturePath, 500, 500);
+            /*
+            try {
+                //bmp = getBitmapFromUri(selectedImage);
+                bmp = BitmapFactoryUtilities.decodeSampledBitmapFromFile(picturePath, 500, 500);
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+            mImageView.setImageBitmap(bmp);
+            */
+
+            // do image-loading work in background
+            BitmapWorkerTask task = new BitmapWorkerTask(mImageView, 500, 500);
+
+            task.execute(picturePath);
+
+            //to know about the selected image width and height
+            //Toast.makeText(NewPostActivity.this, mImageView.getDrawable().getIntrinsicWidth()+" & "+
+            //        mImageView.getDrawable().getIntrinsicHeight(), Toast.LENGTH_SHORT).show();
+
+            //  note that we got the image from the picture gallery
+            fromGallery = true;
+            mCurrentPhotoPath = picturePath;
+        }
+
+        //super.onActivityResult(requestCode, resultCode, intent);
     }
 
     private void showSnackBar(View v) {
@@ -192,9 +265,6 @@ public class NewPostActivity extends AppCompatActivity {
         values.put(Posts.PostEntry.COLUMN_NAME_DESCRIPTION, descText.getText().toString());
         values.put(Posts.PostEntry.COLUMN_NAME_PRICE, priceText.getText().toString());
         values.put(Posts.PostEntry.COLUMN_NAME_PHOTO, mCurrentPhotoPath);
-
-        // camera support
-        /* dispatchTakePictureIntent(); */
 
         // Insert the new row, returning the primary key value of the new row
         long newRowId;
@@ -222,7 +292,10 @@ public class NewPostActivity extends AppCompatActivity {
             //showSnackBar(null);
             addPost();
             showSnackBar(null);
-            galleryAddPic();
+
+            if (!fromGallery) {
+                galleryAddPic();
+            }
         }
         return super.onOptionsItemSelected(item);
     }
@@ -234,34 +307,14 @@ public class NewPostActivity extends AppCompatActivity {
         //File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
 
-        //File image = File.createTempFile(
-        //        imageFileName,  /* prefix */
-        //        ".jpg",         /* suffix */
-        //        storageDir       /* directory */
-        //);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir       /* directory */
+        );
 
-        File image = null;
-        try {
-            // Create the storage directory if it does not exist
-            if (! storageDir.exists()){
-                if (! storageDir.mkdirs()){
-                    Log.d("Hypergaragesale", "failed to create directory");
-                    return null;
-                }
-            }
-
-            image = File.createTempFile(
-                    imageFileName,  /* prefix */
-                    ".jpg",         /* suffix */
-                    storageDir       /* directory */
-            );
-
-        } catch (IOException ex) {
-            Log.e("createTempFile failed", ex.getMessage());
-        }
-
-        //File image = new File(Environment.getExternalStoragePublicDirectory(
-        //        Environment.DIRECTORY_PICTURES), imageFileName + ".jpg");
+        image = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES), imageFileName + ".jpg");
 
         // Save a file: path for use with ACTION_VIEW intents
         mCurrentPhotoPath = image.getAbsolutePath();
@@ -404,4 +457,5 @@ public class NewPostActivity extends AppCompatActivity {
         //mediaScanIntent.setData(photoURI);
         this.sendBroadcast(mediaScanIntent);
     }
+
 }

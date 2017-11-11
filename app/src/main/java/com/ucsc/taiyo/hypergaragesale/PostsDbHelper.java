@@ -12,7 +12,7 @@ public class PostsDbHelper extends SQLiteOpenHelper {
 
     // If you change the database schema, you must increment the database version.
     public static final int DATABASE_VERSION = 1;
-    public static final String DATABASE_NAME = "Posts.db7";
+    public static final String DATABASE_NAME = "Posts.db9";
 
     private static final String TEXT_TYPE = " TEXT";
     private static final String COMMA_SEP = ",";
