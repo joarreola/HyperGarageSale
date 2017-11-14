@@ -6,4 +6,9 @@
     <string name="button_post">Post</string>
     <string name="new_post_snackbar">Thanks for posting!</string>
     <string name="title_activity_browse_posts">BrowsePostActivity</string>
+    <string name="title_activity_detailed_post">DetailedPostActivity</string>
+
+    <string name="title_activity_fullscreen">FullscreenActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
 </resources>

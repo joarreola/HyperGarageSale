@@ -1,7 +1,10 @@
 package com.ucsc.taiyo.hypergaragesale;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
@@ -33,11 +36,13 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         public TextView mTitle;
         public TextView mPrice;
         public ImageView mPhoto;
+        public TextView mDesc;
 
         public ViewHolder(View view) {
             super(view);
             mTitle = (TextView) itemView.findViewById(R.id.titleView);
             mPrice = (TextView) itemView.findViewById(R.id.priceView);
+            //mDesc = (TextView) itemView.findViewById(R.id.descriptionView);
             mPhoto = (ImageView) itemView.findViewById(R.id.ListCameraImageView);
 
             // Implement view click Listener when make each row of RecyclerView clickable
@@ -70,29 +75,37 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
     // Replace the contents of a view (invoked by the layout manager)
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(ViewHolder holder, final int position) {
         // - get elements from your dataset at this position
         // - replace the contents of the views with that elements
         holder.mTitle.setText(mDataset.get(position).mTitle);
         holder.mPrice.setText(mDataset.get(position).mPrice);
 
-        // extract bitmap here in background
-        //holder.mPhoto.setImageBitmap(mDataset.get(position).mPhoto);
-
         // get string path from mDataset
         String photoPathString = mDataset.get(position).mPhoto;
-
-        // do BitmapFactory work in AsyncTask
-        /*
-        BitmapWorkerTask task = new BitmapWorkerTask(holder.mPhoto, 100, 100);
-        task.execute(photoPathString);
-        */
 
         /**
          * photoPathString: use as Mem Cache image key.
          */
         loadBitmap(photoPathString, holder.mPhoto, 100, 100);
 
+        // package entry info in a bundle, pass via extras
+        final Bundle bundle = new Bundle();
+        bundle.putString("Title", mDataset.get(position).mTitle);
+        bundle.putString("Price", mDataset.get(position).mPrice);
+        bundle.putString("Desc", mDataset.get(position).mDesc);
+        bundle.putString("Photo", mDataset.get(position).mPhoto);
+
+        // Onclick
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Context c = v.getContext();
+                Intent intent = new Intent(c, DetailedPostActivity.class);
+                intent.putExtras(bundle);
+                c.startActivity(intent);
+            }
+        });
     }
 
     // Return the size of your dataset (invoked by the layout manager)
@@ -140,4 +153,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         }
 
     }
+
+
 }

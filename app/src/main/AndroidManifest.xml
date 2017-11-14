@@ -2,7 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.ucsc.taiyo.hypergaragesale">
 
-    <uses-feature android:name="android.hardware.camera"
+    <uses-feature
+        android:name="android.hardware.camera"
         android:required="true" />
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -21,21 +22,37 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths"></meta-data>
+                android:resource="@xml/file_paths" />
         </provider>
 
-        <activity android:name=".NewPostActivity"
-            android:parentActivityName=".BrowsePostsActivity">
-        </activity>
-
         <activity
-            android:name=".BrowsePostsActivity"
-            android:label="@string/title_activity_browse_posts" >
+            android:name=".NewPostActivity"
+            android:parentActivityName=".BrowsePostsActivity" />
+
+        <activity android:name=".BrowsePostsActivity"
+            android:label="BrowsePostsActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".DetailedPostActivity"
+            android:label="@string/title_activity_detailed_post"
+            android:parentActivityName=".BrowsePostsActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.ucsc.taiyo.hypergaragesale.BrowsePostsActivity" />
+        </activity>
+
+        <activity
+            android:name=".FullscreenActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_fullscreen"
+            android:theme="@style/FullscreenTheme"></activity>
     </application>
 
 </manifest>

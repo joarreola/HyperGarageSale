@@ -110,6 +110,7 @@ public class NewPostActivity extends AppCompatActivity {
                     //startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
 
                     // Continue only if the File was successfully created
+
                     if (photoFile != null) {
 
                         photoURI = FileProvider.getUriForFile(NewPostActivity.this,
@@ -119,6 +120,7 @@ public class NewPostActivity extends AppCompatActivity {
                         takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                         startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
                     }
+
 
                     // TODO: do I need to explicitly get back to NewPostActivity?
                 }
@@ -189,8 +191,8 @@ public class NewPostActivity extends AppCompatActivity {
 
         // from camera
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
-            //Bundle extras = data.getExtras();
-            //Bitmap imageBitmap = (Bitmap) extras.get("data");
+            //Bundle extras = intent.getExtras();
+            //Bitmap imageBitmap = (Bitmap) extras.get("intent");
             //mImageView.setImageBitmap(imageBitmap);
 
             grabImage(mImageView);
@@ -210,21 +212,6 @@ public class NewPostActivity extends AppCompatActivity {
             int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
             String picturePath = cursor.getString(columnIndex);
             cursor.close();
-
-            /*
-            Bitmap bmp;
-            bmp = BitmapFactoryUtilities.decodeSampledBitmapFromFile(picturePath, 500, 500);
-            /*
-            try {
-                //bmp = getBitmapFromUri(selectedImage);
-                bmp = BitmapFactoryUtilities.decodeSampledBitmapFromFile(picturePath, 500, 500);
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-
-            mImageView.setImageBitmap(bmp);
-            */
 
             // do image-loading work in background
             BitmapWorkerTask task = new BitmapWorkerTask(mImageView, 500, 500);

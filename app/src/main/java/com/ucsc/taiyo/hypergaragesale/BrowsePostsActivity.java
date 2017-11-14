@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.LruCache;
+import android.view.MotionEvent;
 import android.view.View;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
@@ -75,6 +76,7 @@ public class BrowsePostsActivity extends AppCompatActivity {
             }
         });
 
+
         /**
          * Setup LruCache
          */
@@ -122,6 +124,7 @@ public class BrowsePostsActivity extends AppCompatActivity {
                 Posts.PostEntry.COLUMN_NAME_TITLE,
                 Posts.PostEntry.COLUMN_NAME_PRICE,
                 Posts.PostEntry.COLUMN_NAME_PHOTO,
+                Posts.PostEntry.COLUMN_NAME_DESCRIPTION,
         };
 
         // How you want the results sorted in the resulting Cursor
@@ -172,7 +175,8 @@ public class BrowsePostsActivity extends AppCompatActivity {
                 browsePosts.add( new BrowsePosts(
                         cursor.getString(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_TITLE)),
                         cursor.getString(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_PRICE)),
-                        cursor.getString(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_PHOTO)))
+                        cursor.getString(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_PHOTO)),
+                        cursor.getString(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_DESCRIPTION)))
                 );
 
             } while (cursor.moveToNext());
