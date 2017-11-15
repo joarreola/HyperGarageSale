@@ -5,7 +5,6 @@ import android.content.ContentResolver;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -28,9 +27,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.content.Intent;
 import android.widget.ImageView;
-import android.widget.Toast;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -52,7 +49,6 @@ public class NewPostActivity extends AppCompatActivity {
     ImageView mImageView;
     String mCurrentPhotoPath;
     Uri photoURI;
-    byte[] byteArray;
     Boolean fromGallery;
 
     @Override

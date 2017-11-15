@@ -3,6 +3,7 @@ package com.ucsc.taiyo.hypergaragesale;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
@@ -36,13 +37,11 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         public TextView mTitle;
         public TextView mPrice;
         public ImageView mPhoto;
-        public TextView mDesc;
 
         public ViewHolder(View view) {
             super(view);
             mTitle = (TextView) itemView.findViewById(R.id.titleView);
             mPrice = (TextView) itemView.findViewById(R.id.priceView);
-            //mDesc = (TextView) itemView.findViewById(R.id.descriptionView);
             mPhoto = (ImageView) itemView.findViewById(R.id.ListCameraImageView);
 
             // Implement view click Listener when make each row of RecyclerView clickable
