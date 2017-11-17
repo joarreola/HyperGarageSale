@@ -23,10 +23,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.database.sqlite.SQLiteDatabase;
 import android.content.ContentValues;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.content.Intent;
+import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
@@ -47,6 +50,7 @@ public class NewPostActivity extends AppCompatActivity {
     static final int RESULT_LOAD_IMAGE = 3;
     static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 1;
     ImageView mImageView;
+    GridView mGridImageView;
     String mCurrentPhotoPath;
     Uri photoURI;
     Boolean fromGallery;
@@ -72,11 +76,23 @@ public class NewPostActivity extends AppCompatActivity {
         titleText = (EditText)findViewById(R.id.textView_title);
         descText = (EditText)findViewById(R.id.textView_desc);
         priceText = (EditText)findViewById(R.id.textView_price);
-        mImageView = (ImageView) findViewById(R.id.CameraImageView);
+        //mImageView = (ImageView) findViewById(R.id.CameraImageView);
+        mGridImageView = (GridView) findViewById(R.id.gridImageView);
 
         // Gets the data repository in write mode
         PostsDbHelper mDbHelper = new PostsDbHelper(this);
         db = mDbHelper.getWritableDatabase();
+
+        // GridView Adapter and onItemClick code
+        mGridImageView.setAdapter(new ImageAdapter(this));
+
+        mGridImageView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View v,
+                                    int position, long id) {
+                Toast.makeText(NewPostActivity.this, "" + position,
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
 
         // camera intent button
         Button cButton = (Button) findViewById(R.id.cameraButton);
@@ -212,11 +228,14 @@ public class NewPostActivity extends AppCompatActivity {
             // do image-loading work in background
             BitmapWorkerTask task = new BitmapWorkerTask(mImageView, 500, 500);
 
+            // Add to GridView mGridImageView
+
+
             task.execute(picturePath);
 
             //to know about the selected image width and height
-            //Toast.makeText(NewPostActivity.this, mImageView.getDrawable().getIntrinsicWidth()+" & "+
-            //        mImageView.getDrawable().getIntrinsicHeight(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(NewPostActivity.this, mImageView.getDrawable().getIntrinsicWidth()+" & "+
+                    mImageView.getDrawable().getIntrinsicHeight(), Toast.LENGTH_SHORT).show();
 
             //  note that we got the image from the picture gallery
             fromGallery = true;
