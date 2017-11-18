@@ -57,10 +57,8 @@
             android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:layout_alignParentEnd="true"
+            android:layout_alignParentEnd="true" >
 
-           >
-<!--
             <ImageView
                 android:id="@+id/CameraImageView"
                 android:layout_alignParentEnd="true"
@@ -72,27 +70,6 @@
                 android:paddingBottom="8dp"
                 android:paddingLeft="8dp"
                 app:srcCompat="@android:drawable/picture_frame" />
--->
-<!--
-            <GridView
-                android:id="@+id/GridCameraImageView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="16dp"
-                android:layout_marginStart="16dp"
-                android:paddingRight="8dp"
-                android:layout_toLeftOf="@+id/CameraImageView"
-                android:layout_toRightOf="@+id/linearLayout"
-
-
-                android:columnWidth="100dp"
-                android:numColumns="auto_fit"
-                android:verticalSpacing="10dp"
-                android:horizontalSpacing="10dp"
-                android:stretchMode="columnWidth"
-                android:gravity="center" />
-                -->
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -124,40 +101,17 @@
 
             </LinearLayout>
 
-                <!-- android:layout_height="wrap_content" covers
-                     description area when viewed in the Design view.
-                     But does not when running the App -->
-
-                <GridView
-                    android:id="@+id/gridImageView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_toRightOf="@+id/linearLayout"
-                    android:paddingRight="16dp"
-                    android:paddingLeft="16dp"
-                    android:paddingBottom="16dp"
-                    android:paddingTop="16dp"
-                    />
-
-
-            <!--
-                    android:layout_centerHorizontal="true"
-                    android:layout_centerVertical="true"
-
-                    android:paddingRight="8dp"
-                    android:paddingLeft="8dp"
-
-                    android:columnWidth="100dp"
-                    android:numColumns="auto_fit"
-                    android:verticalSpacing="10dp"
-                    android:horizontalSpacing="10dp"
-                    android:stretchMode="columnWidth"
-                    android:gravity="center"
-                    />
-             -->
-
         </RelativeLayout>
 
     </LinearLayout>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/imageAddFab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="@dimen/fab_margin"
+            app:srcCompat="@android:drawable/ic_input_add" />
+
 
 </android.support.design.widget.CoordinatorLayout>

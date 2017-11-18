@@ -117,7 +117,7 @@ public class BrowsePostsActivity extends AppCompatActivity {
         mAdapter.notifyDataSetChanged();
     }
 
-    private ArrayList<BrowsePosts> getDataSet() {
+    public ArrayList<BrowsePosts> getDataSet() {
         // Define a projection that specifies which columns from the database
         // you will actually use after this query.
         String[] projection = {
@@ -171,6 +171,13 @@ public class BrowsePostsActivity extends AppCompatActivity {
                     Log.e("Failed photoURI", e.getMessage());
                 }
             */
+
+                // inspect COLUMN_NAME_PHOTO
+                int titleInt = cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_TITLE);
+                String titleString = cursor.getString(titleInt);
+
+                int photoInt = cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_PHOTO);
+                String photoString = cursor.getString(photoInt);
 
                 browsePosts.add( new BrowsePosts(
                         cursor.getString(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_TITLE)),

@@ -34,6 +34,7 @@ import android.widget.Toast;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 public class NewPostActivity extends AppCompatActivity {
@@ -50,10 +51,10 @@ public class NewPostActivity extends AppCompatActivity {
     static final int RESULT_LOAD_IMAGE = 3;
     static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 1;
     ImageView mImageView;
-    GridView mGridImageView;
     String mCurrentPhotoPath;
     Uri photoURI;
     Boolean fromGallery;
+    ArrayList<String> imagesArray = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,25 +77,15 @@ public class NewPostActivity extends AppCompatActivity {
         titleText = (EditText)findViewById(R.id.textView_title);
         descText = (EditText)findViewById(R.id.textView_desc);
         priceText = (EditText)findViewById(R.id.textView_price);
-        //mImageView = (ImageView) findViewById(R.id.CameraImageView);
-        mGridImageView = (GridView) findViewById(R.id.gridImageView);
+        mImageView = (ImageView) findViewById(R.id.CameraImageView);
 
         // Gets the data repository in write mode
         PostsDbHelper mDbHelper = new PostsDbHelper(this);
         db = mDbHelper.getWritableDatabase();
 
-        // GridView Adapter and onItemClick code
-        mGridImageView.setAdapter(new ImageAdapter(this));
-
-        mGridImageView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View v,
-                                    int position, long id) {
-                Toast.makeText(NewPostActivity.this, "" + position,
-                        Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        // camera intent button
+        /**
+         * Camera intent button
+         */
         Button cButton = (Button) findViewById(R.id.cameraButton);
 
         cButton.setOnClickListener(new View.OnClickListener() {
@@ -139,7 +130,9 @@ public class NewPostActivity extends AppCompatActivity {
             }
         });
 
-        // gallery intent button
+        /**
+         * Gallery intent button
+         */
         Button gButton = (Button) findViewById(R.id.galleryButton);
 
         gButton.setOnClickListener(new View.OnClickListener() {
@@ -158,6 +151,25 @@ public class NewPostActivity extends AppCompatActivity {
                 // TODO: do I need to explicitly get back to NewPostActivity?
             }
         });
+
+        // Create a String ArrayList
+        imagesArray = new ArrayList<>();
+
+        /**
+         * Add image path to ArrayList imagesArray
+         */
+        FloatingActionButton imageAddfab = (FloatingActionButton) findViewById(R.id.imageAddFab);
+        imageAddfab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                //        .setAction("Action", null).show();
+                //startActivity(new Intent(getApplicationContext(), NewPostActivity.class));
+
+                imagesArray.add(mCurrentPhotoPath);
+            }
+        });
+
 
         /*
         private void dispatchTakePictureIntent() {
@@ -194,7 +206,6 @@ public class NewPostActivity extends AppCompatActivity {
 
     }
 
-    // view thumbnail from camera activity: REQUEST_IMAGE_CAPTURE
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
@@ -256,17 +267,21 @@ public class NewPostActivity extends AppCompatActivity {
         }
     }
 
-    //public void newPostAdded(View v) {
-    //    addPost();
-    //}
-
     private void addPost() {
         // Create a new map of values, where column names are the keys
         values = new ContentValues();
         values.put(Posts.PostEntry.COLUMN_NAME_TITLE, titleText.getText().toString());
         values.put(Posts.PostEntry.COLUMN_NAME_DESCRIPTION, descText.getText().toString());
         values.put(Posts.PostEntry.COLUMN_NAME_PRICE, priceText.getText().toString());
-        values.put(Posts.PostEntry.COLUMN_NAME_PHOTO, mCurrentPhotoPath);
+        //values.put(Posts.PostEntry.COLUMN_NAME_PHOTO, mCurrentPhotoPath);
+
+        // concat imageArray entries, space-separated
+        String imagesArrayString = "";
+        for (String path : imagesArray) {
+            imagesArrayString += path.toString() + " ";
+        }
+
+        values.put(Posts.PostEntry.COLUMN_NAME_PHOTO, imagesArrayString);
 
         // Insert the new row, returning the primary key value of the new row
         long newRowId;

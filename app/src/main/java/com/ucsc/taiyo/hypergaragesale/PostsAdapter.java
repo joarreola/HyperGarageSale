@@ -83,10 +83,13 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         // get string path from mDataset
         String photoPathString = mDataset.get(position).mPhoto;
 
+        // space-separated String.
+        String pS[] = photoPathString.split(" ");
+
         /**
          * photoPathString: use as Mem Cache image key.
          */
-        loadBitmap(photoPathString, holder.mPhoto, 100, 100);
+        loadBitmap(pS[0], holder.mPhoto, 100, 100);
 
         // package entry info in a bundle, pass via extras
         final Bundle bundle = new Bundle();
