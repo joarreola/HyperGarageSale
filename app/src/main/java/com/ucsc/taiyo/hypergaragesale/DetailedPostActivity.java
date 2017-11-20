@@ -3,23 +3,14 @@ package com.ucsc.taiyo.hypergaragesale;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.LruCache;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.EditText;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.jakewharton.disklrucache.DiskLruCache;
 
@@ -27,14 +18,9 @@ import java.util.ArrayList;
 
 public class DetailedPostActivity extends AppCompatActivity {
 
-    private TextView titleText;
-    private TextView descText;
-    private TextView priceText;
     ImageView mImageView;
 
-    private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
     static public LruCache mMemoryCache;
     static public DiskLruCache mDiskCache;
     private static final int DISK_CACHE_SIZE = 1024 * 1024 * 10; // 10MB
@@ -52,9 +38,9 @@ public class DetailedPostActivity extends AppCompatActivity {
         int position;
 
         // Views
-        titleText =  (TextView)findViewById(R.id.textView_title);
-        descText =   (TextView)findViewById(R.id.textView_desc);
-        priceText =  (TextView)findViewById(R.id.textView_price);
+        TextView titleText = (TextView) findViewById(R.id.textView_title);
+        TextView descText = (TextView) findViewById(R.id.textView_desc);
+        TextView priceText = (TextView) findViewById(R.id.textView_price);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -66,17 +52,17 @@ public class DetailedPostActivity extends AppCompatActivity {
         descText.append(extras.getString("Desc"));
         position = extras.getInt("Position");
 
-        /**
-         * RecyclerView for photo images
+        /*
+          RecyclerView for photo images
          */
-        mRecyclerView = (RecyclerView) findViewById(R.id.detailed_recycler_view);
+        RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.detailed_recycler_view);
 
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
         mRecyclerView.setHasFixedSize(true);
 
         // use a linear layout manager
-        mLayoutManager = new GridLayoutManager(this.getApplicationContext(), 2);
+        RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(this.getApplicationContext(), 2);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         // specify an adapter (see also next example)
@@ -86,7 +72,6 @@ public class DetailedPostActivity extends AppCompatActivity {
         // Get bitmap via AsyncTask in DetailedImageAdapter
         mAdapter = new PostsAdapter(getDataSet(position));
         mRecyclerView.setAdapter(mAdapter);
-
     }
 
 
@@ -147,6 +132,7 @@ public class DetailedPostActivity extends AppCompatActivity {
 
             //} while (cursor.moveToNext());
         }
+        db.close();
 
         return browsePosts;
     }

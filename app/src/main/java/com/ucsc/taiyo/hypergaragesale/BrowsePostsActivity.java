@@ -11,7 +11,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.LruCache;
-import android.view.MotionEvent;
 import android.view.View;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
@@ -30,9 +29,7 @@ import com.jakewharton.disklrucache.*;
 
 public class BrowsePostsActivity extends AppCompatActivity {
 
-    private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
     static public LruCache mMemoryCache;
     static public DiskLruCache mDiskCache;
     private static final int DISK_CACHE_SIZE = 1024 * 1024 * 10; // 10MB
@@ -47,14 +44,14 @@ public class BrowsePostsActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.posts_recycler_view);
+        RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.posts_recycler_view);
 
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
         mRecyclerView.setHasFixedSize(true);
 
         // use a linear layout manager
-        mLayoutManager = new LinearLayoutManager(this);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         // specify an adapter (see also next example)
@@ -77,8 +74,8 @@ public class BrowsePostsActivity extends AppCompatActivity {
         });
 
 
-        /**
-         * Setup LruCache
+        /*
+          Setup LruCache
          */
         // Get memory class of this device, exceeding this amount will throw an  OutOfMemory exception
         final int memClass =
@@ -95,8 +92,8 @@ public class BrowsePostsActivity extends AppCompatActivity {
             }
         };
 
-        /**
-         *  Initialize DiskLruCache
+        /*
+           Initialize DiskLruCache
          */
         File cacheDir = getCacheDir(this, DISK_CACHE_SUBDIR);
 
@@ -188,6 +185,7 @@ public class BrowsePostsActivity extends AppCompatActivity {
 
             } while (cursor.moveToNext());
         }
+        db.close();
 
         return browsePosts;
     }

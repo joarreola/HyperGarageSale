@@ -1,7 +1,6 @@
 package com.ucsc.taiyo.hypergaragesale;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.widget.ImageView;
 
@@ -23,9 +22,7 @@ import com.jakewharton.disklrucache.*;
 
 public class BitmapWorkerTask extends AsyncTask<String, Void, Bitmap> {
     private final WeakReference imageViewReference;
-    private String File;
     private int reqHeight;
-    private int reqWidth;
     private static final int DISK_CACHE_INDEX = 0;
     private static final String TAG = "ImageCache";
     private final Object mDiskCacheLock = new Object();
@@ -34,29 +31,29 @@ public class BitmapWorkerTask extends AsyncTask<String, Void, Bitmap> {
     public BitmapWorkerTask(ImageView imageView, int reqHeight, int reqWidth) {
         // Use a WeakReference to ensure the ImageView can be garbage collected
         imageViewReference = new WeakReference(imageView);
-        this.reqWidth = reqWidth;
+        int reqWidth1 = reqWidth;
         this.reqHeight = reqHeight;
     }
 
     // Decode image in background.
     @Override
     protected Bitmap doInBackground(String... params) {
-        File = params[0];
+        String file = params[0];
 
 
         // Check disk cache in background thread
-        Bitmap bitmap = getBitmapFromDiskCache(File);
+        Bitmap bitmap = getBitmapFromDiskCache(file);
 
         if (bitmap == null) { // Not found in disk cache
             // Process as normal
             //final Bitmap bitmap = decodeSampledBitmapFromResource(getResources(), params[0], 100, 100));
             bitmap =
-                    new BitmapFactoryUtilities().decodeSampledBitmapFromFile(File, reqHeight, reqHeight);
+                    new BitmapFactoryUtilities().decodeSampledBitmapFromFile(file, reqHeight, reqHeight);
         }
 
         // Add final bitmap to caches
         try {
-            addBitmapToCache(File, bitmap);
+            addBitmapToCache(file, bitmap);
         } catch (Exception e)
         {
             Log.e("addBitmapToCache", e.getMessage());
@@ -120,8 +117,6 @@ public class BitmapWorkerTask extends AsyncTask<String, Void, Bitmap> {
                     } else {
                         snapshot.getInputStream(DISK_CACHE_INDEX).close();
                     }
-                } catch (final IOException e) {
-                    Log.e(TAG, "addBitmapToCache - " + e);
                 } catch (Exception e) {
                     Log.e(TAG, "addBitmapToCache - " + e);
                 } finally {
@@ -215,8 +210,8 @@ public class BitmapWorkerTask extends AsyncTask<String, Void, Bitmap> {
     private static String bytesToHexString(byte[] bytes) {
         // http://stackoverflow.com/questions/332079
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < bytes.length; i++) {
-            String hex = Integer.toHexString(0xFF & bytes[i]);
+        for (byte aByte : bytes) {
+            String hex = Integer.toHexString(0xFF & aByte);
             if (hex.length() == 1) {
                 sb.append('0');
             }

@@ -1,10 +1,6 @@
 package com.ucsc.taiyo.hypergaragesale;
 
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.provider.BaseColumns;
-
-import java.util.ArrayList;
 
 /**
  * Created by taiyo on 6/5/17.

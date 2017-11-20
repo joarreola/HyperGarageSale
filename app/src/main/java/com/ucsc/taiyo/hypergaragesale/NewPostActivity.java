@@ -23,11 +23,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.database.sqlite.SQLiteDatabase;
 import android.content.ContentValues;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.content.Intent;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -40,7 +38,6 @@ import java.util.Date;
 public class NewPostActivity extends AppCompatActivity {
 
     private SQLiteDatabase db;
-    private ContentValues values;
 
     private EditText titleText;
     private EditText descText;
@@ -55,6 +52,7 @@ public class NewPostActivity extends AppCompatActivity {
     Uri photoURI;
     Boolean fromGallery;
     ArrayList<String> imagesArray = new ArrayList<>();
+    FloatingActionButton imageAddfab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,8 +81,8 @@ public class NewPostActivity extends AppCompatActivity {
         PostsDbHelper mDbHelper = new PostsDbHelper(this);
         db = mDbHelper.getWritableDatabase();
 
-        /**
-         * Camera intent button
+        /*
+          Camera intent button
          */
         Button cButton = (Button) findViewById(R.id.cameraButton);
 
@@ -130,8 +128,8 @@ public class NewPostActivity extends AppCompatActivity {
             }
         });
 
-        /**
-         * Gallery intent button
+        /*
+          Gallery intent button
          */
         Button gButton = (Button) findViewById(R.id.galleryButton);
 
@@ -152,13 +150,15 @@ public class NewPostActivity extends AppCompatActivity {
             }
         });
 
-        // Create a String ArrayList
+        /*
+          Add image path to ArrayList imagesArray
+         */
+        // TODO: Display image in a fragment
+        // TODO: Move fab into the fragment after image is supplied
         imagesArray = new ArrayList<>();
 
-        /**
-         * Add image path to ArrayList imagesArray
-         */
-        FloatingActionButton imageAddfab = (FloatingActionButton) findViewById(R.id.imageAddFab);
+        imageAddfab = (FloatingActionButton) findViewById(R.id.imageAddFab);
+
         imageAddfab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -169,7 +169,6 @@ public class NewPostActivity extends AppCompatActivity {
                 imagesArray.add(mCurrentPhotoPath);
             }
         });
-
 
         /*
         private void dispatchTakePictureIntent() {
@@ -209,6 +208,9 @@ public class NewPostActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
+
+        // imageAddfab visible
+        imageAddfab.show();
 
         //if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
 
@@ -266,7 +268,7 @@ public class NewPostActivity extends AppCompatActivity {
 
     private void addPost() {
         // Create a new map of values, where column names are the keys
-        values = new ContentValues();
+        ContentValues values = new ContentValues();
         values.put(Posts.PostEntry.COLUMN_NAME_TITLE, titleText.getText().toString());
         values.put(Posts.PostEntry.COLUMN_NAME_DESCRIPTION, descText.getText().toString());
         values.put(Posts.PostEntry.COLUMN_NAME_PRICE, priceText.getText().toString());
@@ -275,7 +277,8 @@ public class NewPostActivity extends AppCompatActivity {
         // concat imageArray entries, space-separated
         String imagesArrayString = "";
         for (String path : imagesArray) {
-            imagesArrayString += path.toString() + " ";
+            //imagesArrayString += path.toString() + " ";
+            imagesArrayString += path + " ";
         }
 
         values.put(Posts.PostEntry.COLUMN_NAME_PHOTO, imagesArrayString);
@@ -428,20 +431,14 @@ public class NewPostActivity extends AppCompatActivity {
     /* Checks if external storage is available for read and write */
     public boolean isExternalStorageWritable() {
         String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state)) {
-            return true;
-        }
-        return false;
+        return Environment.MEDIA_MOUNTED.equals(state);
     }
 
     /* Checks if external storage is available to at least read */
     public boolean isExternalStorageReadable() {
         String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state) ||
-                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
-            return true;
-        }
-        return false;
+        return Environment.MEDIA_MOUNTED.equals(state) ||
+                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state);
     }
 
     /*

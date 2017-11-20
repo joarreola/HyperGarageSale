@@ -3,22 +3,14 @@ package com.ucsc.taiyo.hypergaragesale;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.provider.MediaStore;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
-import android.util.LruCache;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import java.util.ArrayList;
-
-import static android.support.v4.content.ContextCompat.startActivity;
 
 /**
  * Created by taiyo on 6/5/17.
@@ -112,11 +104,12 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         // space-separated String.
         //String pS[] = photoPathString.split(" ");
 
-        /**
-         * photoPathString: use as Mem Cache image key.
+        /*
+          photoPathString: use as Mem Cache image key.
          */
         if (parentShort.contains("posts_recycler_view")) {
-            loadBitmap(photoPathString, holder.mPhoto, 100, 100);
+            String pS[] = photoPathString.split(" ");
+            loadBitmap(pS[0], holder.mPhoto, 100, 100);
         }
         if (parentShort.contains("detailed_recycler_view")) {
             loadBitmap(photoPathString, holder.mPhoto, 1000, 1000);
@@ -131,12 +124,33 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             bundle.putString("Photo", mDataset.get(position).mPhoto);
             bundle.putInt("Position", position);
 
-            // Onclick
+            // Launch DetailedPost Activity when clicking on a BrowsePost Row.
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Context c = v.getContext();
                     Intent intent = new Intent(c, DetailedPostActivity.class);
+                    intent.putExtras(bundle);
+                    c.startActivity(intent);
+                }
+            });
+        }
+
+        if (parentShort.contains("detailed_recycler_view")) {
+            // package entry info in a bundle, pass via extras
+            final Bundle bundle = new Bundle();
+            bundle.putString("Title", mDataset.get(position).mTitle);
+            //bundle.putString("Price", mDataset.get(position).mPrice);
+            //bundle.putString("Desc", mDataset.get(position).mDesc);
+            bundle.putString("Photo", mDataset.get(position).mPhoto);
+            bundle.putInt("Position", position);
+
+            // Launch Full-screen Activity when clicking on a DetailedPost Image.
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Context c = v.getContext();
+                    Intent intent = new Intent(c, FullscreenActivity.class);
                     intent.putExtras(bundle);
                     c.startActivity(intent);
                 }

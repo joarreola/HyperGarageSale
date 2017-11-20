@@ -57,11 +57,13 @@
             android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:layout_alignParentEnd="true" >
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true">
 
             <ImageView
                 android:id="@+id/CameraImageView"
                 android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
                 android:layout_marginEnd="16dp"
                 android:layout_marginRight="16dp"
@@ -70,6 +72,7 @@
                 android:paddingBottom="8dp"
                 android:paddingLeft="8dp"
                 app:srcCompat="@android:drawable/picture_frame" />
+
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -111,6 +114,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_margin="@dimen/fab_margin"
+            android:visibility="invisible"
             app:srcCompat="@android:drawable/ic_input_add" />
 
 

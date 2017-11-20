@@ -1,7 +1,5 @@
 package com.ucsc.taiyo.hypergaragesale;
 
-import android.graphics.Bitmap;
-
 /**
  * Created by taiyo on 6/5/17.
  */

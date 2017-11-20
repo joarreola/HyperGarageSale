@@ -63,8 +63,7 @@ public class BitmapFactoryUtilities {
         options.inJustDecodeBounds = false;
         //options.inTempStorage =
 
-        Bitmap bitmap =  BitmapFactory.decodeStream(inputStream, null, options);
-        return bitmap;
+        return BitmapFactory.decodeStream(inputStream, null, options);
     }
 
     public static Bitmap decodeSampledBitmapFromDescriptor(FileDescriptor fd, int reqWidth, int reqHeight) {
@@ -80,7 +79,6 @@ public class BitmapFactoryUtilities {
         // Decode bitmap with inSampleSize set
         options.inJustDecodeBounds = false;
 
-        Bitmap bitmap = BitmapFactory.decodeFileDescriptor(fd,  null, options);
-        return bitmap;
+        return BitmapFactory.decodeFileDescriptor(fd,  null, options);
     }
 }
