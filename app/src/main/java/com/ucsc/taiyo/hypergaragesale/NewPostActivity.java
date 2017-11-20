@@ -239,9 +239,6 @@ public class NewPostActivity extends AppCompatActivity {
             // do image-loading work in background
             BitmapWorkerTask task = new BitmapWorkerTask(mImageView, 500, 500);
 
-            // Add to GridView mGridImageView
-
-
             task.execute(picturePath);
 
             //to know about the selected image width and height
