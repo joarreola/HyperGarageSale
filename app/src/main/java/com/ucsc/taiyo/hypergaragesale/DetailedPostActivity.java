@@ -27,15 +27,22 @@ public class DetailedPostActivity extends AppCompatActivity {
     private static final String DISK_CACHE_SUBDIR = "thumbnails";
 
     private SQLiteDatabase db;
+    Bundle extras;
+    String TITLE_KEY = "BUNDLE_TITLE_KEY";
+    String PRICE_KEY = "BUNDLE_PRICE_KEY";
+    String DESCRIPTION_KEY = "BUNDLE_DESCRIPTION_KEY";
+    String POSITION_KEY = "BUNDLE_POSITION_KEY";
+    TextView titleText;
+    TextView descText;
+    TextView priceText;
+    int position = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detailed_post);
-        //setContentView(R.layout.content_detailed_post);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        int position;
 
         // Views
         TextView titleText = (TextView) findViewById(R.id.textView_title);
@@ -44,13 +51,17 @@ public class DetailedPostActivity extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+
         // upack bundle contents from intent extras
-        Intent intent = this.getIntent();
-        Bundle extras = intent.getExtras();
-        titleText.append(extras.getString("Title"));
-        priceText.append(extras.getString("Price"));
-        descText.append(extras.getString("Desc"));
-        position = extras.getInt("Position");
+        if (savedInstanceState == null) {
+            Intent intent = this.getIntent();
+            extras = intent.getExtras();
+            titleText.append(extras.getString("Title"));
+            priceText.append(extras.getString("Price"));
+            descText.append(extras.getString("Desc"));
+            position = extras.getInt("Position");
+        }
+
 
         /*
           RecyclerView for photo images
@@ -74,6 +85,26 @@ public class DetailedPostActivity extends AppCompatActivity {
         mRecyclerView.setAdapter(mAdapter);
     }
 
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        //mTextView.setText(savedInstanceState.getString(TEXT_VIEW_KEY));
+        titleText.append(savedInstanceState.getString(TITLE_KEY));
+        priceText.append(savedInstanceState.getString(PRICE_KEY));
+        descText.append(savedInstanceState.getString(DESCRIPTION_KEY));
+        position = savedInstanceState.getInt(DESCRIPTION_KEY);
+    }
+
+    // invoked when the activity may be temporarily destroyed, save the instance state here
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putString(TITLE_KEY, extras.getString("Title"));
+        outState.putString(PRICE_KEY, extras.getString("Price"));
+        outState.putString(DESCRIPTION_KEY, extras.getString("Desc"));
+        outState.putString(POSITION_KEY, extras.getString("Position"));
+
+        // call superclass to save any view hierarchy
+        super.onSaveInstanceState(outState);
+    }
 
     @Override
     protected void onResume() {

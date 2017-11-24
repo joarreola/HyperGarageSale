@@ -21,6 +21,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     private ArrayList<BrowsePosts> mDataset;
     //static public LruCache mMemoryCache;
     String parentShort = "";
+    String photoList = "";
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -38,14 +39,14 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
             //if parent post_recycler_view, else parent detailed_recycler_view
             if (parent.contains("posts_recycler_view")) {
-                //mTitle = (TextView) itemView.findViewById(R.id.titleView);
-                //mPrice = (TextView) itemView.findViewById(R.id.priceView);
                 mPhoto = (ImageView) itemView.findViewById(R.id.ListCameraImageView);
             }
             if (parent.contains("detailed_recycler_view")) {
                 mPhoto = (ImageView) itemView.findViewById(R.id.DetailedImageView);
             }
-
+            if (parent.contains("detailed_image_recycler_view")) {
+                mPhoto = (ImageView) itemView.findViewById(R.id.DetailedImageRecyclerView);
+            }
 
             // Implement view click Listener when make each row of RecyclerView clickable
 
@@ -79,6 +80,12 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                     .inflate(R.layout.detailed_image_view, parent, false);
             parentShort = "detailed_recycler_view";
         }
+        if (parentString.contains("detailed_image_recycler_view")) {
+            // create a new view
+            v = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.detailed_image_recycler_view, parent, false);
+            parentShort = "detailed_image_recycler_view";
+        }
 
 
         // set the view's size, margins, paddings and layout parameters
@@ -91,6 +98,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
+
         // - get elements from your dataset at this position
         // - replace the contents of the views with that elements
         if (parentShort.contains("posts_recycler_view")) {
@@ -101,9 +109,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         // get string path from mDataset
         String photoPathString = mDataset.get(position).mPhoto;
 
-        // space-separated String.
-        //String pS[] = photoPathString.split(" ");
-
         /*
           photoPathString: use as Mem Cache image key.
          */
@@ -113,6 +118,9 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         }
         if (parentShort.contains("detailed_recycler_view")) {
             loadBitmap(photoPathString, holder.mPhoto, 1000, 1000);
+        }
+        if (parentShort.contains("detailed_image_recycler_view")) {
+            loadBitmap(photoPathString, holder.mPhoto, 3000, 3000);
         }
 
         if (parentShort.contains("posts_recycler_view")) {
@@ -140,9 +148,15 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             // package entry info in a bundle, pass via extras
             final Bundle bundle = new Bundle();
             bundle.putString("Title", mDataset.get(position).mTitle);
-            //bundle.putString("Price", mDataset.get(position).mPrice);
-            //bundle.putString("Desc", mDataset.get(position).mDesc);
-            bundle.putString("Photo", mDataset.get(position).mPhoto);
+            bundle.putString("Price", mDataset.get(position).mPrice);
+            bundle.putString("Desc", mDataset.get(position).mDesc);
+
+            // pass in all mPhoto in mDataset
+            photoList = "";
+            for (BrowsePosts data : mDataset) {
+                photoList += data.mPhoto + ' ';
+            }
+            bundle.putString("Photo", photoList);
             bundle.putInt("Position", position);
 
             // Launch Full-screen Activity when clicking on a DetailedPost Image.
@@ -156,6 +170,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                 }
             });
         }
+
     }
 
     // Return the size of your dataset (invoked by the layout manager)
@@ -184,7 +199,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
         //final String imageKey = String.valueOf(resId);
 
-        final Bitmap bitmap = getBitmapFromMemCache(photoPathString);
+        //final Bitmap bitmap = getBitmapFromMemCache(photoPathString);
+        Bitmap bitmap = null;
 
         if (bitmap != null) {
 
@@ -197,7 +213,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             //BitmapWorkerTask task = new BitmapWorkerTask(holder.mPhoto, 100, 100);
             //task.execute(photoPathString);
 
-            BitmapWorkerTask task = new BitmapWorkerTask(imageView, 100, 100);
+            BitmapWorkerTask task = new BitmapWorkerTask(imageView, reqHeight, reqWidth);
 
             task.execute(photoPathString);
         }

@@ -2,16 +2,18 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    >
 
     <ImageView
-        android:id="@+id/DetailedImageView"
+        android:id="@+id/DetailedImageRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingLeft="8dp"
         android:paddingTop="8dp"
         android:paddingBottom="8dp"
-        android:clickable="false"
+        android:paddingRight="8dp"
+        android:clickable="true"
         />
 
 </LinearLayout>

@@ -46,8 +46,25 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.ucsc.taiyo.hypergaragesale.BrowsePostsActivity" />
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
         </activity>
 
+        <activity
+            android:name=".FullscreenActivity"
+            android:label="@string/title_activity_fullscreen"
+            android:parentActivityName="DetailedPostActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.ucsc.taiyo.hypergaragesale.DetailedPostActivity" />
+        </activity>
+<!--
         <activity
             android:name=".FullscreenActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
@@ -58,6 +75,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.ucsc.taiyo.hypergaragesale.DetailedPostActivity" />
         </activity>
+-->
 
     </application>
 
