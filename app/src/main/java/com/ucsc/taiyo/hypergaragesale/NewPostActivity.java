@@ -167,6 +167,8 @@ public class NewPostActivity extends AppCompatActivity {
                 //startActivity(new Intent(getApplicationContext(), NewPostActivity.class));
 
                 imagesArray.add(mCurrentPhotoPath);
+
+                imageAddfab.hide();
             }
         });
 
@@ -195,8 +197,9 @@ public class NewPostActivity extends AppCompatActivity {
 
             // load image in background
             // TODO: set size in layout xml
+            //int h = mImageView.getDrawable().getIntrinsicHeight();
+            //int w = mImageView.getDrawable().getIntrinsicWidth();
             loadBitmap(mImageView, 500, 500);
-
         }
         catch (Exception e)
         {
@@ -238,21 +241,34 @@ public class NewPostActivity extends AppCompatActivity {
             String picturePath = cursor.getString(columnIndex);
             cursor.close();
 
-            // do image-loading work in background
-            BitmapWorkerTask task = new BitmapWorkerTask(mImageView, 500, 500);
+            // a test
+            //to know about the selected image width and height
+            //Toast.makeText(NewPostActivity.this, mImageView.getDrawable().getIntrinsicWidth()+" & "+
+            //        mImageView.getDrawable().getIntrinsicHeight(), Toast.LENGTH_SHORT).show();
 
-            task.execute(picturePath);
+            // do image-loading work in background
+            mCurrentPhotoPath = picturePath;
+            //BitmapWorkerTask task = new BitmapWorkerTask(mImageView, 500, 500);
+            //task.execute(picturePath);
+            //int h = mImageView.getDrawable().getIntrinsicHeight();
+            //int w = mImageView.getDrawable().getIntrinsicWidth();
+
+            try {
+                loadBitmap(mImageView, 500, 500);
+            }
+            catch (Exception e)
+            {
+                Log.e("Failed to load", e.getMessage());
+            }
 
             //to know about the selected image width and height
             Toast.makeText(NewPostActivity.this, mImageView.getDrawable().getIntrinsicWidth()+" & "+
                     mImageView.getDrawable().getIntrinsicHeight(), Toast.LENGTH_SHORT).show();
 
+
             //  note that we got the image from the picture gallery
             fromGallery = true;
-            mCurrentPhotoPath = picturePath;
         }
-
-        //super.onActivityResult(requestCode, resultCode, intent);
     }
 
     private void showSnackBar(View v) {
@@ -272,7 +288,6 @@ public class NewPostActivity extends AppCompatActivity {
         values.put(Posts.PostEntry.COLUMN_NAME_TITLE, titleText.getText().toString());
         values.put(Posts.PostEntry.COLUMN_NAME_DESCRIPTION, descText.getText().toString());
         values.put(Posts.PostEntry.COLUMN_NAME_PRICE, priceText.getText().toString());
-        //values.put(Posts.PostEntry.COLUMN_NAME_PHOTO, mCurrentPhotoPath);
 
         // concat imageArray entries, space-separated
         String imagesArrayString = "";

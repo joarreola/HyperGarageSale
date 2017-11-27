@@ -58,11 +58,11 @@
         <activity
             android:name=".FullscreenActivity"
             android:label="@string/title_activity_fullscreen"
-            android:parentActivityName="DetailedPostActivity"
+            android:parentActivityName=".BrowsePostsActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.ucsc.taiyo.hypergaragesale.DetailedPostActivity" />
+                android:value="com.ucsc.taiyo.hypergaragesale.BrowsePostsActivity" />
         </activity>
 <!--
         <activity

@@ -95,13 +95,13 @@
         android:id="@+id/fullscreen_content"
         android:clickable="true"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical">
 
         <android.support.v7.widget.RecyclerView
                 android:id="@+id/detailed_image_recycler_view"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:clickable="true"
                 android:scrollbars="vertical"
 
