@@ -122,6 +122,7 @@ public class BrowsePostsActivity extends AppCompatActivity {
                 Posts.PostEntry.COLUMN_NAME_PRICE,
                 Posts.PostEntry.COLUMN_NAME_PHOTO,
                 Posts.PostEntry.COLUMN_NAME_DESCRIPTION,
+                Posts.PostEntry.COLUMN_NAME_LOCATION,
         };
 
         // How you want the results sorted in the resulting Cursor
@@ -176,11 +177,20 @@ public class BrowsePostsActivity extends AppCompatActivity {
                 int photoInt = cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_PHOTO);
                 String photoString = cursor.getString(photoInt);
 
+                int locationInt = cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_LOCATION);
+                String locationString;
+                if (locationInt != -1) {
+                    locationString = cursor.getString(locationInt);
+                } else {
+                    locationString = "NO LOCATION";
+                }
+
                 browsePosts.add( new BrowsePosts(
                         cursor.getString(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_TITLE)),
                         cursor.getString(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_PRICE)),
                         cursor.getString(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_PHOTO)),
-                        cursor.getString(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_DESCRIPTION)))
+                        cursor.getString(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_DESCRIPTION)),
+                        locationString)
                 );
 
             } while (cursor.moveToNext());

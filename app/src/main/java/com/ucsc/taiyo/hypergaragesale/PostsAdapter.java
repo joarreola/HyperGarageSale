@@ -31,11 +31,13 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         public TextView mTitle;
         public TextView mPrice;
         public ImageView mPhoto;
+        public TextView mLoc;
 
         public ViewHolder(View view, String parent) {
             super(view);
             mTitle = (TextView) itemView.findViewById(R.id.titleView);
             mPrice = (TextView) itemView.findViewById(R.id.priceView);
+            mLoc = (TextView) itemView.findViewById(R.id.locationView);
 
             //if parent post_recycler_view, else parent detailed_recycler_view
             if (parent.contains("posts_recycler_view")) {
@@ -104,6 +106,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         if (parentShort.contains("posts_recycler_view")) {
             holder.mTitle.setText(mDataset.get(position).mTitle);
             holder.mPrice.setText(mDataset.get(position).mPrice);
+            holder.mLoc.setText(mDataset.get(position).mLoc);
         }
 
         // get string path from mDataset
@@ -130,6 +133,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             bundle.putString("Price", mDataset.get(position).mPrice);
             bundle.putString("Desc", mDataset.get(position).mDesc);
             bundle.putString("Photo", mDataset.get(position).mPhoto);
+            bundle.putString("Location", mDataset.get(position).mLoc);
             bundle.putInt("Position", position);
 
             // Launch DetailedPost Activity when clicking on a BrowsePost Row.

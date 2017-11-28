@@ -9,11 +9,14 @@ public class BrowsePosts {
     public String mPrice;
     public String mPhoto;
     public String mDesc;
+    public String mLoc;
 
-    public BrowsePosts (String title, String price, String photo, String description) {
+    public BrowsePosts (String title, String price, String photo, String description,
+                        String location) {
         this.mTitle = title;
         this.mPrice = price;
         this.mPhoto = photo;
         this.mDesc = description;
+        this.mLoc = location;
     }
 }

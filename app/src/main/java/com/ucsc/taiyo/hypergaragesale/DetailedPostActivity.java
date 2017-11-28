@@ -146,6 +146,14 @@ public class DetailedPostActivity extends AppCompatActivity {
                 int titleInt = cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_TITLE);
                 String titleString = cursor.getString(titleInt);
 
+                int locationInt = cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_LOCATION);
+                String locationString;
+                if (locationInt != -1) {
+                    locationString = cursor.getString(locationInt);
+                } else {
+                    locationString = "NO LOCATION";
+                }
+
                 int photoInt = cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_PHOTO);
                 String photoString = cursor.getString(photoInt);
 
@@ -157,7 +165,8 @@ public class DetailedPostActivity extends AppCompatActivity {
                             cursor.getString(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_TITLE)),
                             cursor.getString(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_PRICE)),
                             photoPath,
-                            cursor.getString(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_DESCRIPTION)))
+                            cursor.getString(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_DESCRIPTION)),
+                            locationString)
                     );
                 }
 

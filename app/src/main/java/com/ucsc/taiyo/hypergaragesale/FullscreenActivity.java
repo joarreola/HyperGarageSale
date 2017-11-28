@@ -225,6 +225,7 @@ public class FullscreenActivity extends AppCompatActivity {
         String desc = extras.getString("Desc");
         String photoPath = extras.getString("Photo");
         String position = extras.getString("Position");
+        String loc = extras.getString("Location");
 
         ArrayList<BrowsePosts> browsePosts = new ArrayList<>();
 
@@ -236,7 +237,8 @@ public class FullscreenActivity extends AppCompatActivity {
                     title,
                     price,
                     path,
-                    desc)
+                    desc,
+                    loc)
             );
         }
 

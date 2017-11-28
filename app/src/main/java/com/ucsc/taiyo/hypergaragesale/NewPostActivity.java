@@ -2,9 +2,15 @@ package com.ucsc.taiyo.hypergaragesale;
 
 import android.Manifest;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -29,6 +35,14 @@ import android.content.Intent;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+//import com.google.android.gms.location.FusedLocationProviderClient;
+//import com.google.android.gms.location.LocationCallback;
+//import com.google.android.gms.location.LocationListener;
+//import com.google.android.gms.location.LocationRequest;
+//import com.google.android.gms.location.LocationResult;
+//import com.google.android.gms.location.LocationServices;
+//import com.google.android.gms.tasks.OnSuccessListener;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -47,12 +61,24 @@ public class NewPostActivity extends AppCompatActivity {
     static final int REQUEST_TAKE_PHOTO = 2;
     static final int RESULT_LOAD_IMAGE = 3;
     static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 1;
+    static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 2;
     ImageView mImageView;
     String mCurrentPhotoPath;
     Uri photoURI;
     Boolean fromGallery;
     ArrayList<String> imagesArray = new ArrayList<>();
     FloatingActionButton imageAddfab;
+    //private FusedLocationProviderClient mFusedLocationClient;
+    //private LocationCallback mLocationCallback;
+    //private LocationRequest mLocationRequest;
+    String serviceString = Context.LOCATION_SERVICE;
+    LocationManager locationManager;
+    String provider = LocationManager.GPS_PROVIDER;
+    Location location;
+
+    int t = 5000; //milliseconds
+    float distance = 5; // meters
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +106,39 @@ public class NewPostActivity extends AppCompatActivity {
         // Gets the data repository in write mode
         PostsDbHelper mDbHelper = new PostsDbHelper(this);
         db = mDbHelper.getWritableDatabase();
+
+        // Fused location provider client
+        /*
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        mFusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+                // Got last known location. In some rare situations this can be null.
+                if (location != null) {
+                    // Logic to handle location object
+                }
+            }
+        });
+        */
+
+        /*
+        mLocationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                for (Location location : locationResult.getLocations()) {
+                    // Update UI with location data
+                    // ...
+                    //to know about the selected image width and height
+                    String locationString = location.toString();
+                    Toast.makeText(NewPostActivity.this, locationString, Toast.LENGTH_SHORT).show();
+                }
+            };
+        };
+        */
+
+        // Location via not-fusedLocationProvider
+        locationManager = (LocationManager)getSystemService(serviceString);
+
 
         /*
           Camera intent button
@@ -182,6 +241,11 @@ public class NewPostActivity extends AppCompatActivity {
          */
     }
 
+    // disable location updates when app not active
+    /**
+     *
+     * @param mImageView
+     */
     public void grabImage(ImageView mImageView)
     {
         this.getContentResolver().notifyChange(photoURI, null);
@@ -271,6 +335,10 @@ public class NewPostActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     *
+     * @param v
+     */
     private void showSnackBar(View v) {
         if (v == null) {
             Snackbar.make(findViewById(R.id.myCoordinatorLayout), R.string.new_post_snackbar,
@@ -282,12 +350,21 @@ public class NewPostActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     *
+     */
     private void addPost() {
         // Create a new map of values, where column names are the keys
         ContentValues values = new ContentValues();
         values.put(Posts.PostEntry.COLUMN_NAME_TITLE, titleText.getText().toString());
         values.put(Posts.PostEntry.COLUMN_NAME_DESCRIPTION, descText.getText().toString());
         values.put(Posts.PostEntry.COLUMN_NAME_PRICE, priceText.getText().toString());
+        double lat = location.getLatitude();
+        double lon = location.getLongitude();
+        Double.toString(lat);
+        Double.toString(lon);
+        String latlonString = Double.toString(lat) + "," + Double.toString(lon);
+        values.put(Posts.PostEntry.COLUMN_NAME_LOCATION, latlonString);
 
         // concat imageArray entries, space-separated
         String imagesArrayString = "";
@@ -322,9 +399,21 @@ public class NewPostActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_new_post) {
             //showSnackBar(null);
+
+            // check location permission
+            checkPermission();
+            //startLocationUpdates();
+
+            // get last known location, expected by addPost()myLocationListener
+            locationManager.requestLocationUpdates(provider, t, distance, myLocationListener);
+            location = locationManager.getLastKnownLocation(provider);
+
+            // now add to dataBase
             addPost();
+
             showSnackBar(null);
 
+            // add to gallery if a camera shot
             if (!fromGallery) {
                 galleryAddPic();
             }
@@ -332,6 +421,11 @@ public class NewPostActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     *
+     * @return
+     * @throws IOException
+     */
     private File createImageFile() throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
@@ -358,7 +452,10 @@ public class NewPostActivity extends AppCompatActivity {
         return Uri.fromFile(getOutputMediaFile());
     }
 
-    /** Create a File for saving an image or video */
+    /**
+     * Create a File for saving an image or video
+     * @return
+     */
     private File getOutputMediaFile() {
         // To be safe, you should check that the SDCard is mounted
         // using Environment.getExternalStorageState() before doing this.
@@ -440,6 +537,21 @@ public class NewPostActivity extends AppCompatActivity {
 
             // other 'case' lines to check for other
             // permissions this app might request
+            case MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+
+                } else {
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                return;
+            }
         }
     }
 
@@ -464,6 +576,12 @@ public class NewPostActivity extends AppCompatActivity {
     }
     */
 
+    /**
+     *
+     * @param imageView
+     * @param reqHeight
+     * @param reqWidth
+     */
     public void loadBitmap(ImageView imageView, int reqHeight, int reqWidth) {
 
         BitmapWorkerTask task = new BitmapWorkerTask(imageView, reqHeight, reqWidth);
@@ -483,5 +601,85 @@ public class NewPostActivity extends AppCompatActivity {
         //mediaScanIntent.setData(photoURI);
         this.sendBroadcast(mediaScanIntent);
     }
+
+    /**
+     *
+     */
+    private void checkPermission() {
+        // Assume thisActivity is the current activity
+        int permissionCheck = ContextCompat.checkSelfPermission(NewPostActivity.this,
+                Manifest.permission.ACCESS_FINE_LOCATION);
+
+        if (permissionCheck == PackageManager.PERMISSION_DENIED) {
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(NewPostActivity.this,
+                    Manifest.permission.ACCESS_FINE_LOCATION)) {
+
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+
+            } else {
+
+                // No explanation needed, we can request the permission.
+
+                ActivityCompat.requestPermissions(NewPostActivity.this,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+
+                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+                // app-defined int constant. The callback method gets the
+                // result of the request.
+            }
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //if (mRequestingLocationUpdates) {
+        //    startLocationUpdates();
+        //}
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        locationManager.removeUpdates(myLocationListener);
+    }
+    @Override
+    protected void onStart() {
+        super.onStart();
+        locationManager.requestLocationUpdates(provider, t, distance, myLocationListener);
+    }
+
+    /*
+    private void startLocationUpdates() {
+        mFusedLocationClient.requestLocationUpdates(mLocationRequest,
+                mLocationCallback,
+                null //looper);
+    }
+    */
+
+    LocationListener myLocationListener = new LocationListener() {
+
+        public void onLocationChanged(Location location) {
+            // update application based on new location.
+        }
+
+        public void onProviderDisabled(String provider) {
+            // update application if provider disabled.
+        }
+
+        public void onProviderEnabled(String provider) {
+            // update application if provider enabled.
+        }
+
+        public void onStatusChanged(String provider, int status,
+                                    Bundle extras) {
+            // update application if provider hardware status changed.
+        }
+    };
 
 }
