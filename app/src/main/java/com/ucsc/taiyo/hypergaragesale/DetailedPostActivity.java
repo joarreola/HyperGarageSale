@@ -12,6 +12,11 @@ import android.util.LruCache;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.jakewharton.disklrucache.DiskLruCache;
 
 import java.util.ArrayList;
@@ -32,10 +37,12 @@ public class DetailedPostActivity extends AppCompatActivity {
     String PRICE_KEY = "BUNDLE_PRICE_KEY";
     String DESCRIPTION_KEY = "BUNDLE_DESCRIPTION_KEY";
     String POSITION_KEY = "BUNDLE_POSITION_KEY";
+    String LOCATION_KEY = "BUNDLE_LOCATION_KEY";
     TextView titleText;
     TextView descText;
     TextView priceText;
     int position = 0;
+    TextView locText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +55,7 @@ public class DetailedPostActivity extends AppCompatActivity {
         TextView titleText = (TextView) findViewById(R.id.textView_title);
         TextView descText = (TextView) findViewById(R.id.textView_desc);
         TextView priceText = (TextView) findViewById(R.id.textView_price);
+        TextView locText = (TextView) findViewById(R.id.textView_loc);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -60,6 +68,7 @@ public class DetailedPostActivity extends AppCompatActivity {
             priceText.append(extras.getString("Price"));
             descText.append(extras.getString("Desc"));
             position = extras.getInt("Position");
+            locText.append(extras.getString("Location"));
         }
 
 
@@ -83,8 +92,25 @@ public class DetailedPostActivity extends AppCompatActivity {
         // Get bitmap via AsyncTask in DetailedImageAdapter
         mAdapter = new PostsAdapter(getDataSet(position));
         mRecyclerView.setAdapter(mAdapter);
-    }
 
+
+        // Get the SupportMapFragment and request notification
+        // when the map is ready to be used.
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        //mapFragment.getMapAsync(this);
+    }
+/*
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        // Add a marker in Sydney, Australia,
+        // and move the map's camera to the same location.
+        LatLng sydney = new LatLng(-33.852, 151.211);
+        googleMap.addMarker(new MarkerOptions().position(sydney)
+                .title("Marker in Sydney"));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+    }
+*/
     @Override
     public void onRestoreInstanceState(Bundle savedInstanceState) {
         //mTextView.setText(savedInstanceState.getString(TEXT_VIEW_KEY));

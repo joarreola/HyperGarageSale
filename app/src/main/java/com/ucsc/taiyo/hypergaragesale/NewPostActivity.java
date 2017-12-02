@@ -651,6 +651,10 @@ public class NewPostActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+
+        // check location permission
+        checkPermission();
+
         locationManager.requestLocationUpdates(provider, t, distance, myLocationListener);
     }
 

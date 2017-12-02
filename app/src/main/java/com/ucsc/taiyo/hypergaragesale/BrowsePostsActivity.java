@@ -21,6 +21,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.Cursor;
 
 import java.io.File;
+
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.jakewharton.disklrucache.*;
 
 /**
@@ -112,6 +114,11 @@ public class BrowsePostsActivity extends AppCompatActivity {
         super.onResume();
 
         mAdapter.notifyDataSetChanged();
+
+        // check for gms
+        GoogleApiAvailability gmsInstance = GoogleApiAvailability.getInstance();
+        int resCode = gmsInstance.isGooglePlayServicesAvailable(getApplicationContext());
+        //gmsInstance.getErrorDialog(this, resCode)
     }
 
     public ArrayList<BrowsePosts> getDataSet() {
