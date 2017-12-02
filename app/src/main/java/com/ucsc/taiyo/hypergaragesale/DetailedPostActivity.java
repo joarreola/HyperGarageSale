@@ -9,6 +9,8 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.LruCache;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -43,6 +45,9 @@ public class DetailedPostActivity extends AppCompatActivity {
     TextView priceText;
     int position = 0;
     TextView locText;
+    String locationString;
+    String goodLocation;
+    String title;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,10 +70,12 @@ public class DetailedPostActivity extends AppCompatActivity {
             Intent intent = this.getIntent();
             extras = intent.getExtras();
             titleText.append(extras.getString("Title"));
+            title = extras.getString("Title");
             priceText.append(extras.getString("Price"));
             descText.append(extras.getString("Desc"));
             position = extras.getInt("Position");
             locText.append(extras.getString("Location"));
+            goodLocation = extras.getString("Location");
         }
 
 
@@ -93,24 +100,8 @@ public class DetailedPostActivity extends AppCompatActivity {
         mAdapter = new PostsAdapter(getDataSet(position));
         mRecyclerView.setAdapter(mAdapter);
 
+    }
 
-        // Get the SupportMapFragment and request notification
-        // when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        //mapFragment.getMapAsync(this);
-    }
-/*
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        // Add a marker in Sydney, Australia,
-        // and move the map's camera to the same location.
-        LatLng sydney = new LatLng(-33.852, 151.211);
-        googleMap.addMarker(new MarkerOptions().position(sydney)
-                .title("Marker in Sydney"));
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-    }
-*/
     @Override
     public void onRestoreInstanceState(Bundle savedInstanceState) {
         //mTextView.setText(savedInstanceState.getString(TEXT_VIEW_KEY));
@@ -173,7 +164,6 @@ public class DetailedPostActivity extends AppCompatActivity {
                 String titleString = cursor.getString(titleInt);
 
                 int locationInt = cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_LOCATION);
-                String locationString;
                 if (locationInt != -1) {
                     locationString = cursor.getString(locationInt);
                 } else {
@@ -201,5 +191,30 @@ public class DetailedPostActivity extends AppCompatActivity {
         db.close();
 
         return browsePosts;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.detailed_post_menu, menu);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_detailed_post) {
+
+            // bundle location
+            final Bundle bundle = new Bundle();
+            bundle.putString("location", goodLocation);
+            bundle.putString("title", title);
+
+            // launch map activity
+            Intent intent = new Intent(getApplicationContext(), MapsMarkerActivity.class);
+            intent.putExtras(bundle);
+            startActivity(intent);
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
