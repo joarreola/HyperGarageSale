@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
@@ -35,15 +36,22 @@ import com.jakewharton.disklrucache.*;
  * Created by taiyo on 6/5/17.
  */
 
-public class BrowsePostsActivity extends AppCompatActivity {
+public class BrowsePostsActivity extends AppCompatActivity  {
 
-    private RecyclerView.Adapter mAdapter;
+    public RecyclerView.Adapter mAdapter;
     static public LruCache mMemoryCache;
     static public DiskLruCache mDiskCache;
     private static final int DISK_CACHE_SIZE = 1024 * 1024 * 10; // 10MB
     private static final String DISK_CACHE_SUBDIR = "thumbnails";
 
     private SQLiteDatabase db;
+    String searchQuery;
+    ArrayList<BrowsePosts> browsePosts = new ArrayList<>();
+    ArrayList<BrowsePosts> searchPost = new ArrayList<>();
+    RecyclerView mRecyclerView;
+    PostsDbHelper mDbHelper;
+    Boolean searchDone = false;
+    Boolean backArrow = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,11 +59,25 @@ public class BrowsePostsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_browse_posts);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        Intent intent = getIntent();
+
+        ActionBar actionBar = getSupportActionBar();
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            backArrow = true;
+        } else {
+            backArrow = false;
+        }
+        try {
+            actionBar.setDisplayHomeAsUpEnabled(backArrow);
+        } catch (NullPointerException ex) {
+            Log.e("setDisplayHomeAsUpEnabl", ex.getMessage());
+        }
+
 
         // search intent
-        handleIntent(getIntent());
+        handleIntent(intent);
 
-        RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.posts_recycler_view);
+        mRecyclerView = (RecyclerView) findViewById(R.id.posts_recycler_view);
 
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
@@ -65,22 +87,28 @@ public class BrowsePostsActivity extends AppCompatActivity {
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        // specify an adapter (see also next example)
-        PostsDbHelper mDbHelper = new PostsDbHelper(this);
-        db = mDbHelper.getReadableDatabase();
+        if (!Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            // specify an adapter (see also next example)
+            mDbHelper = new PostsDbHelper(this);
+            db = mDbHelper.getReadableDatabase();
 
-        // Get bitmap via AsyncTask in PostsAdapter
-        mAdapter = new PostsAdapter(getDataSet());
-        mRecyclerView.setAdapter(mAdapter);
-
+            // Get bitmap via AsyncTask in PostsAdapter
+            mAdapter = new PostsAdapter(getDataSet());
+            mRecyclerView.setAdapter(mAdapter);
+        }
+        else
+        {
+            mAdapter = new PostsAdapter(searchPost);
+            mRecyclerView.setAdapter(mAdapter);
+        }
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-                startActivity(new Intent(getApplicationContext(), NewPostActivity.class));
+                    Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                    startActivity(new Intent(getApplicationContext(), NewPostActivity.class));
             }
         });
 
@@ -118,15 +146,21 @@ public class BrowsePostsActivity extends AppCompatActivity {
         }
     }
 
+/*
     @Override
     protected void onNewIntent(Intent intent) {
         handleIntent(intent);
     }
-
+*/
     private void handleIntent(Intent intent) {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            String query = intent.getStringExtra(SearchManager.QUERY);
-            //use the query to search your data somehow
+            searchQuery = intent.getStringExtra(SearchManager.QUERY);
+
+            mDbHelper = new PostsDbHelper(this);
+            db = mDbHelper.getReadableDatabase();
+            searchPost = filterBrowsePosts(searchQuery);
+
+            searchDone = true;
         }
     }
 
@@ -223,10 +257,65 @@ public class BrowsePostsActivity extends AppCompatActivity {
 
             } while (cursor.moveToNext());
         }
-        db.close();
+        //db.close();
 
         return browsePosts;
     }
+
+    public ArrayList<BrowsePosts> filterBrowsePosts(String searchQuery) {
+        String[] projection = {
+                Posts.PostEntry.COLUMN_NAME_TITLE,
+                Posts.PostEntry.COLUMN_NAME_PRICE,
+                Posts.PostEntry.COLUMN_NAME_PHOTO,
+                Posts.PostEntry.COLUMN_NAME_DESCRIPTION,
+                Posts.PostEntry.COLUMN_NAME_LOCATION,
+        };
+
+        String sortOrder =
+                Posts.PostEntry.COLUMN_NAME_PRICE + " DESC";
+
+        Cursor cursor = db.query(
+                Posts.PostEntry.TABLE_NAME,  // The table to query
+                projection,                               // The columns to return
+                null,                                     // The columns for the WHERE clause
+                null,                                     // The values for the WHERE clause
+                null,                                     // don't group the rows
+                null,                                     // don't filter by row groups
+                sortOrder                                 // The sort order
+        );
+
+        ArrayList<BrowsePosts> searchPost = new ArrayList<>();
+
+        if (cursor.moveToFirst()) {
+            do {
+                int locationInt = cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_LOCATION);
+                String locationString;
+                if (locationInt != -1) {
+                    locationString = cursor.getString(locationInt);
+                } else {
+                    locationString = "NO LOCATION";
+                }
+
+                String title = cursor.getString(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_TITLE));
+                if (title.toLowerCase().contains(searchQuery.toLowerCase())) {
+                    searchPost.add(new BrowsePosts(
+                            cursor.getString(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_TITLE)),
+                            cursor.getString(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_PRICE)),
+                            cursor.getString(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_PHOTO)),
+                            cursor.getString(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_DESCRIPTION)),
+                            locationString)
+                    );
+                }
+
+            } while (cursor.moveToNext());
+        }
+        //db.close();
+
+        return searchPost;
+    }
+
+
+
 
     // Creates a unique subdirectory of the designated app cache directory. Tries to use external
     // but if not mounted, falls back on internal storage.
@@ -253,34 +342,5 @@ public class BrowsePostsActivity extends AppCompatActivity {
 
         return true;
     }
-
-    /*
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the options menu from XML
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.browse_post_menu, menu);
-
-        // Get the SearchView and set the searchable configuration
-        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
-        // Assumes current activity is the searchable activity
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
-
-        return true;
-    }
-    */
-/*
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.search) {
-            Intent searchIntent = new Intent(Intent.ACTION_SEARCH);
-            //.sendBroadcast(searchIntent);
-            startActivity(searchIntent);
-        }
-        return super.onOptionsItemSelected(item);
-    }
-    */
 
 }

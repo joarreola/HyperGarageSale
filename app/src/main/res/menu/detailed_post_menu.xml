@@ -5,6 +5,7 @@
     <item
         android:id="@+id/action_detailed_post"
         android:title="MAP"
+        android:background="@color/colorGray"
         app:showAsAction="always"/>
 
     <!--
