@@ -54,13 +54,14 @@
                 android:layout_height="wrap_content"
                 android:paddingTop="16dp"
                 android:textSize="18sp" />
-
+            <!--
             <TextView
                 android:id="@+id/locationView"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:paddingTop="16dp"
                 android:textSize="18sp" />
+                -->
 
         </LinearLayout>
 

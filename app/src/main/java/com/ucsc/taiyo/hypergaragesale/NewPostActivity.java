@@ -7,6 +7,8 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -48,6 +50,8 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 public class NewPostActivity extends AppCompatActivity {
 
@@ -75,6 +79,7 @@ public class NewPostActivity extends AppCompatActivity {
     LocationManager locationManager;
     String provider = LocationManager.GPS_PROVIDER;
     Location location;
+    //List<Address> addresses = null;
 
     int t = 5000; //milliseconds
     float distance = 5; // meters
@@ -359,12 +364,15 @@ public class NewPostActivity extends AppCompatActivity {
         values.put(Posts.PostEntry.COLUMN_NAME_TITLE, titleText.getText().toString());
         values.put(Posts.PostEntry.COLUMN_NAME_DESCRIPTION, descText.getText().toString());
         values.put(Posts.PostEntry.COLUMN_NAME_PRICE, priceText.getText().toString());
+
         double lat = location.getLatitude();
         double lon = location.getLongitude();
         Double.toString(lat);
         Double.toString(lon);
         String latlonString = Double.toString(lat) + "," + Double.toString(lon);
         values.put(Posts.PostEntry.COLUMN_NAME_LOCATION, latlonString);
+
+        //values.put(Posts.PostEntry.COLUMN_NAME_LOCATION, addresses.get(0).toString());
 
         // concat imageArray entries, space-separated
         String imagesArrayString = "";
@@ -405,8 +413,13 @@ public class NewPostActivity extends AppCompatActivity {
             //startLocationUpdates();
 
             // get last known location, expected by addPost()myLocationListener
-            locationManager.requestLocationUpdates(provider, t, distance, myLocationListener);
+            //locationManager.requestLocationUpdates(provider, t, distance, myLocationListener);
             location = locationManager.getLastKnownLocation(provider);
+            /*
+            try {
+                getAddress();
+            } catch (IOException e) {}
+            */
 
             // now add to dataBase
             addPost();
@@ -420,7 +433,17 @@ public class NewPostActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+/*
+    public void getAddress() throws IOException {
 
+        double lat = location.getLatitude();
+        double lon = location.getLongitude();
+        Geocoder gc = new Geocoder(this, Locale.getDefault());
+        try {
+            addresses = gc.getFromLocation(lat, lon, 3);
+        } catch (IOException e) {}
+    }
+*/
     /**
      *
      * @return
@@ -655,7 +678,7 @@ public class NewPostActivity extends AppCompatActivity {
         // check location permission
         checkPermission();
 
-        locationManager.requestLocationUpdates(provider, t, distance, myLocationListener);
+        //locationManager.requestLocationUpdates(provider, t, distance, myLocationListener);
     }
 
     /*

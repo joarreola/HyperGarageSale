@@ -3,6 +3,8 @@ package com.ucsc.taiyo.hypergaragesale;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -16,14 +18,18 @@ import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.jakewharton.disklrucache.DiskLruCache;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
-public class DetailedPostActivity extends AppCompatActivity {
+public class DetailedPostActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     ImageView mImageView;
 
@@ -49,6 +55,10 @@ public class DetailedPostActivity extends AppCompatActivity {
     String goodLocation;
     String title;
 
+    String[] loc;
+    List<Address> addresses = null;
+    String address;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,10 +67,10 @@ public class DetailedPostActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         // Views
-        TextView titleText = (TextView) findViewById(R.id.textView_title);
-        TextView descText = (TextView) findViewById(R.id.textView_desc);
-        TextView priceText = (TextView) findViewById(R.id.textView_price);
-        TextView locText = (TextView) findViewById(R.id.textView_loc);
+        titleText = (TextView) findViewById(R.id.textView_title);
+        descText = (TextView) findViewById(R.id.textView_desc);
+        priceText = (TextView) findViewById(R.id.textView_price);
+        locText = (TextView) findViewById(R.id.textView_loc);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -74,8 +84,9 @@ public class DetailedPostActivity extends AppCompatActivity {
             priceText.append(extras.getString("Price"));
             descText.append(extras.getString("Desc"));
             position = extras.getInt("Position");
-            locText.append(extras.getString("Location"));
-            goodLocation = extras.getString("Location");
+            //locText.append(extras.getString("Location"));
+            locationString = extras.getString("Location");
+            loc = locationString.split(",");
         }
 
 
@@ -100,6 +111,48 @@ public class DetailedPostActivity extends AppCompatActivity {
         mAdapter = new PostsAdapter(getDataSet(position));
         mRecyclerView.setAdapter(mAdapter);
 
+        // Get the SupportMapFragment and request notification
+        // when the map is ready to be used.
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        // Add a marker at Post location
+        // and move the map's camera to the same location.
+        LatLng postLocation = new LatLng(Double.parseDouble(loc[0]), Double.parseDouble(loc[1]));
+
+        //try {
+            getAddress();
+        //} catch (IOException e) {}
+
+        if (addresses == null) {
+            //try {
+                getAddress();
+            //} catch (IOException e) {}
+        }
+        String street = addresses.get(0).getAddressLine(0);
+        String city = addresses.get(0).getAddressLine(1);
+        String country = addresses.get(0).getAddressLine(2);
+        String address = street + "\n" + city + ", " + country;
+
+        // update textView
+        locText.append(address);
+
+        googleMap.addMarker(new MarkerOptions().position(postLocation)
+                .title(address));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLng(postLocation));
+    }
+
+    public void getAddress() {
+
+        Geocoder gc = new Geocoder(this, Locale.getDefault());
+        try {
+            addresses = gc.getFromLocation(Double.parseDouble(loc[0]), Double.parseDouble(loc[1]), 3);
+        } catch (IOException e) {}
     }
 
     @Override
@@ -192,7 +245,7 @@ public class DetailedPostActivity extends AppCompatActivity {
 
         return browsePosts;
     }
-
+/* remove MAP from toolbar
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -217,4 +270,5 @@ public class DetailedPostActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+*/
 }

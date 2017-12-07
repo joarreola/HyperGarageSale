@@ -9,6 +9,10 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:context="com.example.mapwithmarker.MapsMarkerActivity" />
+        tools:context="com.ucsc.taiyo.hypergaragesale.MapsMarkerActivity"/>
+
+    <!--
+    tools:context="com.example.mapwithmarker.MapsMarkerActivity"
+    -->
 
 </LinearLayout>

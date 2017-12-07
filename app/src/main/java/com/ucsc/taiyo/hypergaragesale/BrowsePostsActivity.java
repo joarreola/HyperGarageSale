@@ -1,6 +1,8 @@
 package com.ucsc.taiyo.hypergaragesale;
 
 import android.app.ActivityManager;
+import android.app.SearchManager;
+import android.app.SearchableInfo;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -8,9 +10,13 @@ import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.LruCache;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
@@ -45,6 +51,9 @@ public class BrowsePostsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_browse_posts);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        // search intent
+        handleIntent(getIntent());
 
         RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.posts_recycler_view);
 
@@ -106,6 +115,18 @@ public class BrowsePostsActivity extends AppCompatActivity {
         catch (Exception e)
         {
             Log.e("DiskLruCache.open", e.getMessage());
+        }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        handleIntent(intent);
+    }
+
+    private void handleIntent(Intent intent) {
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            String query = intent.getStringExtra(SearchManager.QUERY);
+            //use the query to search your data somehow
         }
     }
 
@@ -218,5 +239,48 @@ public class BrowsePostsActivity extends AppCompatActivity {
 
         return new File(cachePath + File.separator + uniqueName);
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.browse_post_menu, menu);
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+
+        SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+
+        //searchView.setIconifiedByDefault(false);
+
+        return true;
+    }
+
+    /*
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the options menu from XML
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.browse_post_menu, menu);
+
+        // Get the SearchView and set the searchable configuration
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+        // Assumes current activity is the searchable activity
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
+
+        return true;
+    }
+    */
+/*
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.search) {
+            Intent searchIntent = new Intent(Intent.ACTION_SEARCH);
+            //.sendBroadcast(searchIntent);
+            startActivity(searchIntent);
+        }
+        return super.onOptionsItemSelected(item);
+    }
+    */
 
 }

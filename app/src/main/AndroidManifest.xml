@@ -47,6 +47,13 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+
+            <meta-data android:name="android.app.searchable"
+                android:resource="@xml/searchable"/>
         </activity>
 
         <activity
@@ -85,6 +92,25 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.ucsc.taiyo.hypergaragesale.DetailedPostActivity" />
         </activity>
+<!--
+        <activity android:name=".SearchResultsActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+
+        </activity>
+-->
+        <!--
+        <activity android:name=".SearchableActivity" >
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+
+            <meta-data android:name="android.app.searchable"
+                android:resource="@xml/searchable"/>
+
+        </activity>
+        -->
 <!--
         <activity
             android:name=".FullscreenActivity"
