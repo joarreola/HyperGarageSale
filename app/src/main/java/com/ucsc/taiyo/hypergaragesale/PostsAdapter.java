@@ -177,6 +177,12 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
     }
 
+    public void setFilter(ArrayList<BrowsePosts> newList){
+        this.mDataset = new ArrayList<>();
+        this.mDataset.addAll(newList);
+        notifyDataSetChanged();
+    }
+
     // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {

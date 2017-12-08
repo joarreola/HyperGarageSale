@@ -39,6 +39,7 @@ import com.jakewharton.disklrucache.*;
 public class BrowsePostsActivity extends AppCompatActivity  {
 
     public RecyclerView.Adapter mAdapter;
+    public RecyclerView.Adapter mAdapterSearch;
     static public LruCache mMemoryCache;
     static public DiskLruCache mDiskCache;
     private static final int DISK_CACHE_SIZE = 1024 * 1024 * 10; // 10MB
@@ -50,8 +51,10 @@ public class BrowsePostsActivity extends AppCompatActivity  {
     ArrayList<BrowsePosts> searchPost = new ArrayList<>();
     RecyclerView mRecyclerView;
     PostsDbHelper mDbHelper;
+    PostsDbHelper mDbHelperSearch;
     Boolean searchDone = false;
     Boolean backArrow = false;
+    FloatingActionButton fab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,20 +77,20 @@ public class BrowsePostsActivity extends AppCompatActivity  {
         }
 
 
-        // search intent
-        handleIntent(intent);
+        //if (!Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            // search intent
+            //handleIntent(intent);
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.posts_recycler_view);
+            mRecyclerView = (RecyclerView) findViewById(R.id.posts_recycler_view);
 
-        // use this setting to improve performance if you know that changes
-        // in content do not change the layout size of the RecyclerView
-        mRecyclerView.setHasFixedSize(true);
+            // use this setting to improve performance if you know that changes
+            // in content do not change the layout size of the RecyclerView
+            mRecyclerView.setHasFixedSize(true);
 
-        // use a linear layout manager
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
-        mRecyclerView.setLayoutManager(mLayoutManager);
+            // use a linear layout manager
+            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
+            mRecyclerView.setLayoutManager(mLayoutManager);
 
-        if (!Intent.ACTION_SEARCH.equals(intent.getAction())) {
             // specify an adapter (see also next example)
             mDbHelper = new PostsDbHelper(this);
             db = mDbHelper.getReadableDatabase();
@@ -95,13 +98,26 @@ public class BrowsePostsActivity extends AppCompatActivity  {
             // Get bitmap via AsyncTask in PostsAdapter
             mAdapter = new PostsAdapter(getDataSet());
             mRecyclerView.setAdapter(mAdapter);
-        }
-        else
-        {
+
+            FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                    startActivity(new Intent(getApplicationContext(), NewPostActivity.class));
+                }
+            });
+
+       //}
+       /*
+       else {
             mAdapter = new PostsAdapter(searchPost);
             mRecyclerView.setAdapter(mAdapter);
         }
+        */
 
+        /*
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -111,6 +127,7 @@ public class BrowsePostsActivity extends AppCompatActivity  {
                     startActivity(new Intent(getApplicationContext(), NewPostActivity.class));
             }
         });
+        */
 
 
         /*
@@ -146,19 +163,24 @@ public class BrowsePostsActivity extends AppCompatActivity  {
         }
     }
 
-/*
+
     @Override
     protected void onNewIntent(Intent intent) {
+
         handleIntent(intent);
     }
-*/
+
     private void handleIntent(Intent intent) {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             searchQuery = intent.getStringExtra(SearchManager.QUERY);
 
-            mDbHelper = new PostsDbHelper(this);
-            db = mDbHelper.getReadableDatabase();
-            searchPost = filterBrowsePosts(searchQuery);
+            this.mDbHelper = new PostsDbHelper(this);
+            this.db = mDbHelper.getReadableDatabase();
+            this.searchPost = filterBrowsePosts(searchQuery);
+
+            this.mAdapter = new PostsAdapter(searchPost);
+            this.mRecyclerView = (RecyclerView) findViewById(R.id.posts_recycler_view);
+            this.mRecyclerView.setAdapter(mAdapter);
 
             searchDone = true;
         }
@@ -168,12 +190,23 @@ public class BrowsePostsActivity extends AppCompatActivity  {
     protected void onResume() {
         super.onResume();
 
+        Intent intent = getIntent();
+
+        if (searchDone) {
+            searchDone = false;
+        }
         mAdapter.notifyDataSetChanged();
 
         // check for gms
         GoogleApiAvailability gmsInstance = GoogleApiAvailability.getInstance();
         int resCode = gmsInstance.isGooglePlayServicesAvailable(getApplicationContext());
         //gmsInstance.getErrorDialog(this, resCode)
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
     }
 
     public ArrayList<BrowsePosts> getDataSet() {
@@ -263,6 +296,8 @@ public class BrowsePostsActivity extends AppCompatActivity  {
     }
 
     public ArrayList<BrowsePosts> filterBrowsePosts(String searchQuery) {
+        String[] search = {searchQuery};
+
         String[] projection = {
                 Posts.PostEntry.COLUMN_NAME_TITLE,
                 Posts.PostEntry.COLUMN_NAME_PRICE,
@@ -271,6 +306,38 @@ public class BrowsePostsActivity extends AppCompatActivity  {
                 Posts.PostEntry.COLUMN_NAME_LOCATION,
         };
 
+/* SQL experiment
+        Cursor cursor = db.query(
+                Posts.PostEntry.TABLE_NAME,  // The table to query
+                projection,                               // The columns to return
+                Posts.PostEntry.COLUMN_NAME_TITLE+"=?",         // The columns for the WHERE clause
+                new String[]{searchQuery},                                     // The values for the WHERE clause
+                null,                                     // don't group the rows
+                null,                                     // don't filter by row groups
+                null                                 // The sort order
+        );
+        //sortOrder                                 // The sort order
+
+        ArrayList<BrowsePosts> searchPost = new ArrayList<>();
+
+        int locationInt = cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_LOCATION);
+        String locationString;
+        if (locationInt != -1) {
+            locationString = cursor.getString(locationInt);
+        } else {
+            locationString = "NO LOCATION";
+        }
+
+        searchPost.add(new BrowsePosts(
+                cursor.getString(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_TITLE)),
+                cursor.getString(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_PRICE)),
+                cursor.getString(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_PHOTO)),
+                cursor.getString(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_DESCRIPTION)),
+                locationString)
+        );
+*/
+
+        // How you want the results sorted in the resulting Cursor
         String sortOrder =
                 Posts.PostEntry.COLUMN_NAME_PRICE + " DESC";
 
@@ -286,6 +353,8 @@ public class BrowsePostsActivity extends AppCompatActivity  {
 
         ArrayList<BrowsePosts> searchPost = new ArrayList<>();
 
+
+        // db manual search
         if (cursor.moveToFirst()) {
             do {
                 int locationInt = cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_LOCATION);
@@ -309,6 +378,7 @@ public class BrowsePostsActivity extends AppCompatActivity  {
 
             } while (cursor.moveToNext());
         }
+
         //db.close();
 
         return searchPost;
@@ -343,4 +413,11 @@ public class BrowsePostsActivity extends AppCompatActivity  {
         return true;
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_new_post) {
+
+        }
+        return super.onOptionsItemSelected(item);
+    }
 }
