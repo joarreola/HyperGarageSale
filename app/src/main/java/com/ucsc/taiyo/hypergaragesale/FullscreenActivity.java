@@ -238,7 +238,8 @@ public class FullscreenActivity extends AppCompatActivity {
                     price,
                     path,
                     desc,
-                    loc)
+                    loc,
+                    position)
             );
         }
 

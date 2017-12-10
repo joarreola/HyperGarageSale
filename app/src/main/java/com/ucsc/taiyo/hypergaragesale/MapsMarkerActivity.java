@@ -36,7 +36,6 @@ public class MapsMarkerActivity extends AppCompatActivity  implements OnMapReady
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Retrieve the content view that renders the map.
         setContentView(R.layout.activity_maps);
 
         //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -66,12 +65,10 @@ public class MapsMarkerActivity extends AppCompatActivity  implements OnMapReady
         LatLng postLocation = new LatLng(Double.parseDouble(loc[0]), Double.parseDouble(loc[1]));
         googleMap.addMarker(new MarkerOptions().position(postLocation)
                 .title(location));
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(postLocation));
-/*
-        try {
-            getAddress();
-        } catch (IOException e) {}
-        */
+        //googleMap.moveCamera(CameraUpdateFactory.newLatLng(postLocation));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(postLocation, 12.0f));
+        googleMap.animateCamera(CameraUpdateFactory.zoomTo(17.0f));
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(postLocation, (float) 14));
     }
 
     public void getAddress() throws IOException {

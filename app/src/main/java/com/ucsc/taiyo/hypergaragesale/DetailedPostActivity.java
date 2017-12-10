@@ -49,11 +49,12 @@ public class DetailedPostActivity extends AppCompatActivity implements OnMapRead
     TextView titleText;
     TextView descText;
     TextView priceText;
-    int position = 0;
+    String position;
     TextView locText;
     String locationString;
     String goodLocation;
     String title;
+    String photo;
 
     String[] loc;
     List<Address> addresses = null;
@@ -83,10 +84,11 @@ public class DetailedPostActivity extends AppCompatActivity implements OnMapRead
             title = extras.getString("Title");
             priceText.append(extras.getString("Price"));
             descText.append(extras.getString("Desc"));
-            position = extras.getInt("Position");
+            position = extras.getString("Position");
             //locText.append(extras.getString("Location"));
             locationString = extras.getString("Location");
             loc = locationString.split(",");
+            photo = extras.getString("Photo");
         }
 
 
@@ -108,7 +110,7 @@ public class DetailedPostActivity extends AppCompatActivity implements OnMapRead
         db = mDbHelper.getReadableDatabase();
 
         // Get bitmap via AsyncTask in DetailedImageAdapter
-        mAdapter = new PostsAdapter(getDataSet(position));
+        mAdapter = new PostsAdapter(getDataSet(Integer.parseInt(position)));
         mRecyclerView.setAdapter(mAdapter);
 
         // Get the SupportMapFragment and request notification
@@ -161,7 +163,7 @@ public class DetailedPostActivity extends AppCompatActivity implements OnMapRead
         titleText.append(savedInstanceState.getString(TITLE_KEY));
         priceText.append(savedInstanceState.getString(PRICE_KEY));
         descText.append(savedInstanceState.getString(DESCRIPTION_KEY));
-        position = savedInstanceState.getInt(DESCRIPTION_KEY);
+        //position = savedInstanceState.getInt(DESCRIPTION_KEY);
     }
 
     // invoked when the activity may be temporarily destroyed, save the instance state here
@@ -235,7 +237,8 @@ public class DetailedPostActivity extends AppCompatActivity implements OnMapRead
                             cursor.getString(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_PRICE)),
                             photoPath,
                             cursor.getString(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_DESCRIPTION)),
-                            locationString)
+                            locationString,
+                            String.valueOf(position))
                     );
                 }
 
@@ -245,30 +248,6 @@ public class DetailedPostActivity extends AppCompatActivity implements OnMapRead
 
         return browsePosts;
     }
-/* remove MAP from toolbar
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.detailed_post_menu, menu);
 
-        return true;
-    }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_detailed_post) {
-
-            // bundle location
-            final Bundle bundle = new Bundle();
-            bundle.putString("location", goodLocation);
-            bundle.putString("title", title);
-
-            // launch map activity
-            Intent intent = new Intent(getApplicationContext(), MapsMarkerActivity.class);
-            intent.putExtras(bundle);
-            startActivity(intent);
-        }
-        return super.onOptionsItemSelected(item);
-    }
-*/
 }

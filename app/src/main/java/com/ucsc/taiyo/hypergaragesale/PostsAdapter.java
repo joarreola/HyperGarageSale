@@ -22,6 +22,9 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     //static public LruCache mMemoryCache;
     String parentShort = "";
     String photoList = "";
+    int listCameraImageViewSize = 100;
+    int detailedImageViewSize = 1000;
+    int DetailedImageRecyclerViewSize = 3000;
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -31,13 +34,11 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         public TextView mTitle;
         public TextView mPrice;
         public ImageView mPhoto;
-        public TextView mLoc;
 
         public ViewHolder(View view, String parent) {
             super(view);
             mTitle = (TextView) itemView.findViewById(R.id.titleView);
             mPrice = (TextView) itemView.findViewById(R.id.priceView);
-            //mLoc = (TextView) itemView.findViewById(R.id.locationView);
 
             //if parent post_recycler_view, else parent detailed_recycler_view
             if (parent.contains("posts_recycler_view")) {
@@ -100,13 +101,11 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
-
         // - get elements from your dataset at this position
         // - replace the contents of the views with that elements
         if (parentShort.contains("posts_recycler_view")) {
             holder.mTitle.setText(mDataset.get(position).mTitle);
             holder.mPrice.setText(mDataset.get(position).mPrice);
-            //holder.mLoc.setText(mDataset.get(position).mLoc);
         }
 
         // get string path from mDataset
@@ -117,31 +116,39 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
          */
         if (parentShort.contains("posts_recycler_view")) {
             String pS[] = photoPathString.split(" ");
-            loadBitmap(pS[0], holder.mPhoto, 100, 100);
+            holder.mPhoto.invalidate();
+            holder.mPhoto.clearAnimation();
+            loadBitmap(pS[0], holder.mPhoto, listCameraImageViewSize,
+                    listCameraImageViewSize);
         }
         if (parentShort.contains("detailed_recycler_view")) {
-            loadBitmap(photoPathString, holder.mPhoto, 1000, 1000);
+            loadBitmap(photoPathString, holder.mPhoto, detailedImageViewSize,
+                    detailedImageViewSize);
         }
         if (parentShort.contains("detailed_image_recycler_view")) {
-            loadBitmap(photoPathString, holder.mPhoto, 3000, 3000);
+            loadBitmap(photoPathString, holder.mPhoto, DetailedImageRecyclerViewSize,
+                    DetailedImageRecyclerViewSize);
         }
 
         if (parentShort.contains("posts_recycler_view")) {
-            // package entry info in a bundle, pass via extras
-            final Bundle bundle = new Bundle();
-            bundle.putString("Title", mDataset.get(position).mTitle);
-            bundle.putString("Price", mDataset.get(position).mPrice);
-            bundle.putString("Desc", mDataset.get(position).mDesc);
-            bundle.putString("Photo", mDataset.get(position).mPhoto);
-            bundle.putString("Location", mDataset.get(position).mLoc);
-            bundle.putInt("Position", position);
 
             // Launch DetailedPost Activity when clicking on a BrowsePost Row.
             holder.itemView.setOnClickListener(new View.OnClickListener() {
+
                 @Override
                 public void onClick(View v) {
                     Context c = v.getContext();
                     Intent intent = new Intent(c, DetailedPostActivity.class);
+                    String pos = mDataset.get(position).mPos;
+
+                    final Bundle bundle = new Bundle();
+                    bundle.putString("Title", mDataset.get(position).mTitle);
+                    bundle.putString("Price", mDataset.get(position).mPrice);
+                    bundle.putString("Desc", mDataset.get(position).mDesc);
+                    bundle.putString("Photo", mDataset.get(position).mPhoto);
+                    bundle.putString("Location", mDataset.get(position).mLoc);
+                    bundle.putString("Position", mDataset.get(position).mPos);
+
                     intent.putExtras(bundle);
                     c.startActivity(intent);
                 }
@@ -187,6 +194,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     public void setFilter(ArrayList<BrowsePosts> newList) {
         mDataset = new ArrayList<>();
         mDataset.addAll(newList);
+
         notifyDataSetChanged();
     }
 
@@ -194,13 +202,13 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
      *
      * Memory Caching Code
      */
-
+    /*
     public void addBitmapToMemoryCache(String key, Bitmap bitmap) {
         if (getBitmapFromMemCache(key) == null) {
             BrowsePostsActivity.mMemoryCache.put(key, bitmap);
         }
     }
-
+    */
     public Bitmap getBitmapFromMemCache(String key) {
 
         return (Bitmap) BrowsePostsActivity.mMemoryCache.get(key);
@@ -210,8 +218,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
         //final String imageKey = String.valueOf(resId);
 
-        //final Bitmap bitmap = getBitmapFromMemCache(photoPathString);
-        Bitmap bitmap = null;
+        final Bitmap bitmap = getBitmapFromMemCache(photoPathString);
+        //Bitmap bitmap = null;
 
         if (bitmap != null) {
 
@@ -220,9 +228,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         } else {
 
             //imageView.setImageResource(R.drawable.image_placeholder);
-
-            //BitmapWorkerTask task = new BitmapWorkerTask(holder.mPhoto, 100, 100);
-            //task.execute(photoPathString);
 
             BitmapWorkerTask task = new BitmapWorkerTask(imageView, reqHeight, reqWidth);
 

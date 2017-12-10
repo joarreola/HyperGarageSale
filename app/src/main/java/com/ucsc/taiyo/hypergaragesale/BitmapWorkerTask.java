@@ -45,10 +45,10 @@ public class BitmapWorkerTask extends AsyncTask<String, Void, Bitmap> {
         Bitmap bitmap = getBitmapFromDiskCache(file);
 
         if (bitmap == null) { // Not found in disk cache
-            // Process as normal
-            //final Bitmap bitmap = decodeSampledBitmapFromResource(getResources(), params[0], 100, 100));
+
             bitmap =
-                    new BitmapFactoryUtilities().decodeSampledBitmapFromFile(file, reqHeight, reqHeight);
+                    new BitmapFactoryUtilities().decodeSampledBitmapFromFile(file,
+                            reqHeight, reqHeight);
         }
 
         // Add final bitmap to caches
@@ -87,7 +87,7 @@ public class BitmapWorkerTask extends AsyncTask<String, Void, Bitmap> {
      * @param data Unique identifier for the bitmap to store
      * @param bitmap The bitmap drawable to store
      */
-    public void addBitmapToCache(String data, Bitmap bitmap) {
+    public synchronized void addBitmapToCache(String data, Bitmap bitmap) {
         if (data == null || bitmap == null) {
             return;
         }
@@ -97,7 +97,7 @@ public class BitmapWorkerTask extends AsyncTask<String, Void, Bitmap> {
             BrowsePostsActivity.mMemoryCache.put(data, bitmap);
         }
 
-        //synchronized (mDiskCacheLock) {
+        synchronized (mDiskCacheLock) {
             // Add to disk cache
             if (BrowsePostsActivity.mDiskCache != null) {
                 final String key = hashKeyForDisk(data);
@@ -127,7 +127,7 @@ public class BitmapWorkerTask extends AsyncTask<String, Void, Bitmap> {
                     } catch (IOException e) {}
                 }
             }
-        //}
+        }
     }
 
     /**
@@ -140,14 +140,17 @@ public class BitmapWorkerTask extends AsyncTask<String, Void, Bitmap> {
         final String key = hashKeyForDisk(data);
         Bitmap bitmap = null;
 
-        //synchronized (mDiskCacheLock) {
-            /* getting stuck here
+        synchronized (mDiskCacheLock) {
+            // getting stuck here.
+            // not anymore, but no images in BrowserPostsActivity (?)
+            /*
             while (mDiskCacheStarting) {
                 try {
                     mDiskCacheLock.wait();
                 } catch (InterruptedException e) {}
             }
             */
+
             if (BrowsePostsActivity.mDiskCache != null) {
                 InputStream inputStream = null;
                 try {
@@ -181,9 +184,8 @@ public class BitmapWorkerTask extends AsyncTask<String, Void, Bitmap> {
                 }
             }
             return bitmap;
-        //}
+        }
     }
-
 
 
     public Bitmap getBitmapFromMemCache(String key) {
@@ -192,8 +194,8 @@ public class BitmapWorkerTask extends AsyncTask<String, Void, Bitmap> {
     }
 
     /**
-     * A hashing method that changes a string (like a URL) into a hash suitable for using as a
-     * disk filename. (From BitmapFun)
+     * A hashing method that changes a string (like a URL) into a hash suitable
+     * for using as a disk filename. (From BitmapFun)
      */
     public static String hashKeyForDisk(String key) {
         String cacheKey;
@@ -208,7 +210,6 @@ public class BitmapWorkerTask extends AsyncTask<String, Void, Bitmap> {
     }
 
     private static String bytesToHexString(byte[] bytes) {
-        // http://stackoverflow.com/questions/332079
         StringBuilder sb = new StringBuilder();
         for (byte aByte : bytes) {
             String hex = Integer.toHexString(0xFF & aByte);

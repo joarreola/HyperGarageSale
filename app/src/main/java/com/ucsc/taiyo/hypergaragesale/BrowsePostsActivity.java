@@ -27,6 +27,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import java.util.ArrayList;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.Cursor;
+import android.widget.Toast;
 
 import java.io.File;
 
@@ -186,6 +187,11 @@ public class BrowsePostsActivity extends AppCompatActivity implements SearchView
         if (cursor.moveToFirst()) {
 
             do {
+                // get curson position
+                int position = cursor.getPosition();
+                String positionString = String.valueOf(position);
+
+
                 // inspect COLUMN_NAME_PHOTO
                 int titleInt = cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_TITLE);
                 String titleString = cursor.getString(titleInt);
@@ -206,7 +212,9 @@ public class BrowsePostsActivity extends AppCompatActivity implements SearchView
                         cursor.getString(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_PRICE)),
                         cursor.getString(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_PHOTO)),
                         cursor.getString(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_DESCRIPTION)),
-                        locationString)
+                        locationString,
+                        positionString
+                        )
                 );
 
             } while (cursor.moveToNext());
@@ -242,15 +250,28 @@ public class BrowsePostsActivity extends AppCompatActivity implements SearchView
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         return super.onOptionsItemSelected(item);
+
     }
 
     @Override
     public boolean onQueryTextSubmit(String query) {
-        return false;
+        //return false;
+        query = query.toLowerCase();
+        ArrayList<BrowsePosts> newList = new ArrayList<>();
+        for (BrowsePosts post : browsePosts)
+        {
+            String name = post.mTitle.toLowerCase();
+            if (name.contains(query)) {
+                newList.add(post);
+            }
+        }
+        mAdapter.setFilter(newList);
+        return true;
     }
 
     @Override
     public boolean onQueryTextChange(String newText) {
+        /*
         newText = newText.toLowerCase();
         ArrayList<BrowsePosts> newList = new ArrayList<>();
         for (BrowsePosts post : browsePosts)
@@ -262,6 +283,8 @@ public class BrowsePostsActivity extends AppCompatActivity implements SearchView
         }
         mAdapter.setFilter(newList);
         return true;
+        */
+        return false;
     }
 
 }
