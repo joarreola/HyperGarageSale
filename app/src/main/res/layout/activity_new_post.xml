@@ -26,7 +26,7 @@
             android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
 
-        <!-- post addition, oct 23, 2017 -->
+
         <EditText
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -79,11 +79,6 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:id="@+id/linearLayout">
-                <!--
-                xmlns:tools="http://schemas.android.com/tools"
-                xmlns:app="http://schemas.android.com/apk/res-auto"
-                tools:context="com.ucsc.taiyo.hypergaragesale.NewPostActivity">
-                -->
 
                 <Button
                     android:id="@+id/cameraButton"
