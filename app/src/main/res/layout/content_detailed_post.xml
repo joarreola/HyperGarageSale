@@ -9,10 +9,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="com.ucsc.taiyo.hypergaragesale.DetailedPostActivity">
 
-    <!--
-        android:titleTextColor="@color/colorPrimaryDark"
-        -->
-
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -75,7 +71,7 @@
             android:layout_weight="1"
             android:paddingTop="@dimen/activity_vertical_margin"
             android:paddingRight="@dimen/activity_vertical_margin"
-            android:paddingLeft="@dimen/activity_vertical_margin"
+            android:paddingEnd="@dimen/activity_vertical_margin"
             android:textSize="18sp" />
 
         <fragment
