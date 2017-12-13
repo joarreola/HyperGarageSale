@@ -13,7 +13,6 @@
     tools:context="com.ucsc.taiyo.hypergaragesale.BrowsePostsActivity"
     tools:showIn="@layout/activity_browse_posts">
 
-    <!-- A RecyclerView with some commonly used attributes -->
     <android.support.v7.widget.RecyclerView
         android:id="@+id/posts_recycler_view"
         android:layout_width="match_parent"
