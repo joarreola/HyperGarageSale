@@ -27,6 +27,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import java.util.ArrayList;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.Cursor;
+import android.widget.Button;
 import android.widget.Toast;
 
 import java.io.File;
@@ -51,6 +52,7 @@ public class BrowsePostsActivity extends AppCompatActivity implements SearchView
     private RecyclerView mRecyclerView;
     private PostsDbHelper mDbHelper;
     private Boolean backArrow = false;
+    Button fullListButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +70,7 @@ public class BrowsePostsActivity extends AppCompatActivity implements SearchView
         } else {
             backArrow = false;
         }
+
         try {
             actionBar.setDisplayHomeAsUpEnabled(backArrow);
         } catch (NullPointerException ex) {
@@ -137,6 +140,39 @@ public class BrowsePostsActivity extends AppCompatActivity implements SearchView
         {
             Log.e("DiskLruCache.open", e.getMessage());
         }
+
+        // Full List Button
+        fullListButton = (Button) findViewById(R.id.fullListButton);
+        fullListButton.setVisibility(View.GONE);
+        fullListButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                //        .setAction("Action", null).show();
+                startActivity(new Intent(getApplicationContext(), BrowsePostsActivity.class));
+
+            }
+        });
+
+        /*
+        fullListButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                try{
+                    //Intent fullListButton = new Intent(Intent.ACTION_PICK,
+                    //        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    //startActivityForResult(galleryIntet, RESULT_LOAD_IMAGE);
+
+                    startActivity(new Intent(getApplicationContext(), BrowsePostsActivity.class));
+
+                }catch(Exception exp){
+                    Log.i("Error",exp.toString());
+                }
+            }
+        });
+        */
+
     }
 
     @Override
@@ -244,6 +280,8 @@ public class BrowsePostsActivity extends AppCompatActivity implements SearchView
         MenuItem search = menu.findItem(R.id.search);
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(search);
         searchView.setOnQueryTextListener(this);
+        searchView.setQueryHint("Enter keyword...");
+
         return true;
     }
 
@@ -266,6 +304,10 @@ public class BrowsePostsActivity extends AppCompatActivity implements SearchView
             }
         }
         mAdapter.setFilter(newList);
+
+        // show button to get back to the full list
+        fullListButton.setVisibility(View.VISIBLE);
+
         return true;
     }
 

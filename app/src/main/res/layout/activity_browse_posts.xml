@@ -34,6 +34,18 @@
 
     <include layout="@layout/content_browse_post" />
 
+    <Button
+        android:id="@+id/fullListButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Full List"
+        android:textSize="10dp"
+        android:layout_gravity="bottom|start" />
+    <!--
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        -->
+
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"

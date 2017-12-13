@@ -217,8 +217,6 @@ public class NewPostActivity extends AppCompatActivity {
         /*
           Add image path to ArrayList imagesArray
          */
-        // TODO: Display image in a fragment
-        // TODO: Move fab into the fragment after image is supplied
         imagesArray = new ArrayList<>();
 
         imageAddfab = (FloatingActionButton) findViewById(R.id.imageAddFab);
