@@ -89,15 +89,6 @@
                 android:value="com.ucsc.taiyo.hypergaragesale.BrowsePostsActivity" />
         </activity>
 
-        <activity
-            android:name=".MapsMarkerActivity"
-            android:label="MapsMarkerActivity"
-            android:parentActivityName=".DetailedPostActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.ucsc.taiyo.hypergaragesale.DetailedPostActivity" />
-        </activity>
 <!--
         <activity android:name=".SearchResultsActivity">
             <intent-filter>
