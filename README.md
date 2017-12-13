@@ -3,17 +3,15 @@ Form UCSC-Extention class by Taral Oza
 
 Bugs:
 
-1- Can't get back to full list from a search result.
-
-2- In some cases, get an empty list in BrowesePostsActivity. Don't yet know the sequence.
-
-3- Get incorrect image on a search result. Appears to be from the pre-search row.
 
 
 Recent changes:
 
-1- Enabled synchronization in the disk-caching code. Though, need to figure out where mDiskCacheStarting
-   is set to false.
+1- Enabled synchronization in the disk-caching code. Though, need to figure out
+   where mDiskCacheStarting is set to false.
+   
+2- Added Full List button to get back to full list from a search result.
+   
    
 TO DO:
 
