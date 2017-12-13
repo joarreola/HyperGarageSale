@@ -176,6 +176,11 @@ public class BrowsePostsActivity extends AppCompatActivity
         super.onStart();
     }
 
+    /**
+     * Populate ArrayList browsePosts with all data in DataBase
+     *
+     * @return browsePosts
+     */
     public ArrayList<BrowsePosts> getDataSet() {
 
         String[] projection = {
@@ -209,6 +214,7 @@ public class BrowsePostsActivity extends AppCompatActivity
                 int locationInt = cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_LOCATION);
 
                 String locationString = "NO LOCATION";
+
                 if (locationInt != -1) {
 
                     locationString = cursor.getString(locationInt);
