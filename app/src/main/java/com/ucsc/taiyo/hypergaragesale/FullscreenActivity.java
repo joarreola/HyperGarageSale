@@ -1,23 +1,14 @@
 package com.ucsc.taiyo.hypergaragesale;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ImageView;
-
 import java.util.ArrayList;
 
 /**
@@ -25,201 +16,64 @@ import java.util.ArrayList;
  * status bar and navigation/system bar) with user interaction.
  */
 public class FullscreenActivity extends AppCompatActivity {
-    //public ImageView mPhotoView;
-    private SQLiteDatabase db;
-    private RecyclerView.Adapter mAdapter;
 
-    /**
-     * Whether or not the system UI should be auto-hidden after
-     * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
-     */
-    private static final boolean AUTO_HIDE = true;
-
-    /**
-     * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after
-     * user interaction before hiding the system UI.
-     */
-    private static final int AUTO_HIDE_DELAY_MILLIS = 3000;
-
-    /**
-     * Some older devices needs a small delay between UI widget updates
-     * and a change of the status and navigation bar.
-     */
-    private static final int UI_ANIMATION_DELAY = 300;
-    private final Handler mHideHandler = new Handler();
-    private View mContentView;
-/*
-    private final Runnable mHidePart2Runnable = new Runnable() {
-        @SuppressLint("InlinedApi")
-        @Override
-        public void run() {
-            // Delayed removal of status and navigation bar
-
-            // Note that some of these constants are new as of API 16 (Jelly Bean)
-            // and API 19 (KitKat). It is safe to use them, as they are inlined
-            // at compile-time and do nothing on earlier devices.
-            mContentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
-                    | View.SYSTEM_UI_FLAG_FULLSCREEN
-                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
-        }
-    };
-*/
-
-    private View mControlsView;
-    /*
-    private final Runnable mShowPart2Runnable = new Runnable() {
-        @Override
-        public void run() {
-            // Delayed display of UI elements
-            ActionBar actionBar = getSupportActionBar();
-            if (actionBar != null) {
-                actionBar.show();
-            }
-            mControlsView.setVisibility(View.VISIBLE);
-        }
-    };
-    */
-    private boolean mVisible;
-    /*
-    private final Runnable mHideRunnable = new Runnable() {
-        @Override
-        public void run() {
-            hide();
-        }
-    };
-    */
-    /**
-     * Touch listener to use for in-layout UI controls to delay hiding the
-     * system UI. This is to prevent the jarring behavior of controls going away
-     * while interacting with activity UI.
-     */
-    /*
-    private final View.OnTouchListener mDelayHideTouchListener = new View.OnTouchListener() {
-        @Override
-        public boolean onTouch(View view, MotionEvent motionEvent) {
-            if (AUTO_HIDE) {
-                delayedHide(AUTO_HIDE_DELAY_MILLIS);
-            }
-            return false;
-        }
-    };
-    */
+    private PostsAdapter mAdapter;
+    Bundle extras;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_fullscreen);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
         setSupportActionBar(toolbar);
 
+        // to get back to parent BrowsePostsActivity
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        mVisible = true;
-        //mControlsView = findViewById(R.id.fullscreen_content_controls);
-        //mContentView = findViewById(R.id.fullscreen_content);
-        //mContentView = findViewById(R.id.detailed_image_recycler_view);
-/*
-        // Set up the user interaction to manually show or hide the system UI.
-        mContentView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                toggle();
-            }
-        });
-*/
-        // Upon interacting with UI controls, delay any scheduled hide()
-        // operations to prevent the jarring behavior of controls going away
-        // while interacting with the UI.
-        //findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
-
-        // upack bundle contents from intent extras
+        // Unpack bundle contents
         Intent intent = this.getIntent();
-        Bundle extras = intent.getExtras();
+        extras = intent.getExtras();
 
-        /*
-          RecyclerView for full-size photo images
-         */
-        RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.detailed_image_recycler_view);
+        // RecyclerView for full-size photo images
+        setupRecyclerView();
+    }
 
-        // use this setting to improve performance if you know that changes
-        // in content do not change the layout size of the RecyclerView
+    /**
+     * Setup the detailed_image_recycler_view RecyclerView, for full-sized
+     * photo images.
+     * - Use a LinearLayout
+     * - Populate ArrayList from Intent bundle
+     */
+    private void setupRecyclerView() {
+
+        RecyclerView mRecyclerView =
+                (RecyclerView) findViewById(R.id.detailed_image_recycler_view);
+
         mRecyclerView.setHasFixedSize(true);
 
-        // use a linear layout manager
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
+
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        // specify an adapter (see also next example)
-        PostsDbHelper mDbHelper = new PostsDbHelper(this);
+        //PostsDbHelper mDbHelper = new PostsDbHelper(this);
 
-        // Get bitmap via AsyncTask in DetailedImageAdapter
         mAdapter = new PostsAdapter(getDataSet(extras));
+
         mRecyclerView.setAdapter(mAdapter);
     }
-/*
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
 
-        // Trigger the initial hide() shortly after the activity has been
-        // created, to briefly hint to the user that UI controls
-        // are available.
-        delayedHide(100);
-    }
-
-    private void toggle() {
-        if (mVisible) {
-            hide();
-        } else {
-            show();
-        }
-    }
-
-    private void hide() {
-        // Hide UI first
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.hide();
-        }
-        mControlsView.setVisibility(View.GONE);
-        mVisible = false;
-
-        // Schedule a runnable to remove the status and navigation bar after a delay
-        mHideHandler.removeCallbacks(mShowPart2Runnable);
-        mHideHandler.postDelayed(mHidePart2Runnable, UI_ANIMATION_DELAY);
-    }
-
-    @SuppressLint("InlinedApi")
-    private void show() {
-        // Show the system bar
-        mContentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
-        mVisible = true;
-
-        // Schedule a runnable to display UI elements after a delay
-        mHideHandler.removeCallbacks(mHidePart2Runnable);
-        mHideHandler.postDelayed(mShowPart2Runnable, UI_ANIMATION_DELAY);
-    }
-*/
     /**
-     * Schedules a call to hide() in [delay] milliseconds, canceling any
-     * previously scheduled calls.
-     */
-/*
-    private void delayedHide(int delayMillis) {
-        mHideHandler.removeCallbacks(mHideRunnable);
-        mHideHandler.postDelayed(mHideRunnable, delayMillis);
-    }
-*/
-    /**
-     * Adds BrowsePosts structures that differ in Photo path.
+     * Populate ArrayList fullSizePhotos with all full-sized photos.
+     *
      * @param extras
-     * @return
+     * @return fullSizePhotos
      */
     public ArrayList<BrowsePosts> getDataSet(Bundle extras) {
+
         String title = extras.getString("Title");
         String price = extras.getString("Price");
         String desc = extras.getString("Desc");
@@ -227,13 +81,14 @@ public class FullscreenActivity extends AppCompatActivity {
         String position = extras.getString("Position");
         String loc = extras.getString("Location");
 
-        ArrayList<BrowsePosts> browsePosts = new ArrayList<>();
+        ArrayList<BrowsePosts> fullSizePhotos = new ArrayList<>();
 
         // for each photoPath string
-        String photoPathArray[] = photoPath.split(" ");
+        //String photoPathArray[] = photoPath.split(" ");
 
-        for (String path : photoPathArray) {
-            browsePosts.add(new BrowsePosts(
+        for (String path : photoPath.split(" ")) {
+
+            fullSizePhotos.add(new BrowsePosts(
                     title,
                     price,
                     path,
@@ -243,6 +98,6 @@ public class FullscreenActivity extends AppCompatActivity {
             );
         }
 
-        return browsePosts;
+        return fullSizePhotos;
     }
 }
