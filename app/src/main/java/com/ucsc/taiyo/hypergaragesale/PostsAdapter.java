@@ -19,7 +19,6 @@ import java.util.ArrayList;
 public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
 
     private ArrayList<BrowsePosts> mDataset;
-    //static public LruCache mMemoryCache;
     String parentShort = "";
     String photoList = "";
     int listCameraImageViewSize = 100;
@@ -27,10 +26,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     int DetailedImageRecyclerViewSize = 3000;
 
     // Provide a reference to the views for each data item
-    // Complex data items may need more than one view per item, and
-    // you provide access to all the views for a data item in a view holder
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        // each data item is just a string in this case
+
         public TextView mTitle;
         public TextView mPrice;
         public ImageView mPhoto;
@@ -40,7 +37,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             mTitle = (TextView) itemView.findViewById(R.id.titleView);
             mPrice = (TextView) itemView.findViewById(R.id.priceView);
 
-            //if parent post_recycler_view, else parent detailed_recycler_view
             if (parent.contains("posts_recycler_view")) {
                 mPhoto = (ImageView) itemView.findViewById(R.id.ListCameraImageView);
             }
@@ -51,17 +47,13 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                 mPhoto = (ImageView) itemView.findViewById(R.id.DetailedImageRecyclerView);
             }
 
-            // Implement view click Listener when make each row of RecyclerView clickable
-
         }
     }
 
-    // Provide a suitable constructor (depends on the kind of dataset)
-    //public PostsAdapter(ArrayList<BrowsePosts> myDataset, LruCache mMemoryCache) {
+
     public PostsAdapter(ArrayList<BrowsePosts> myDataset) {
 
         mDataset = myDataset;
-        //this.mMemoryCache = mMemoryCache;
     }
 
     // Create new views (invoked by the layout manager)
@@ -69,31 +61,32 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     public PostsAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = null;
 
-        // if parent post_recycler_view, else parent detailed_recycler_view
         String parentString = parent.toString();
+
         if (parentString.contains("posts_recycler_view")) {
             // create a new view
             v = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.post_text_view, parent, false);
+
             parentShort = "posts_recycler_view";
         }
         if (parentString.contains("detailed_recycler_view")) {
             // create a new view
             v = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.detailed_image_view, parent, false);
+
             parentShort = "detailed_recycler_view";
         }
         if (parentString.contains("detailed_image_recycler_view")) {
             // create a new view
             v = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.detailed_image_recycler_view, parent, false);
+
             parentShort = "detailed_image_recycler_view";
         }
 
-
-        // set the view's size, margins, paddings and layout parameters
-
         ViewHolder vh = new ViewHolder(v, parentShort);
+
         return vh;
     }
 
@@ -111,13 +104,11 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         // get string path from mDataset
         String photoPathString = mDataset.get(position).mPhoto;
 
-        /*
-          photoPathString: use as Mem Cache image key.
-         */
+        // photoPathString: use as Mem Cache image key.
         if (parentShort.contains("posts_recycler_view")) {
             String pS[] = photoPathString.split(" ");
-            holder.mPhoto.invalidate();
-            holder.mPhoto.clearAnimation();
+            //holder.mPhoto.invalidate();
+            //holder.mPhoto.clearAnimation();
             loadBitmap(pS[0], holder.mPhoto, listCameraImageViewSize,
                     listCameraImageViewSize);
         }
@@ -138,8 +129,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                 @Override
                 public void onClick(View v) {
                     Context c = v.getContext();
-                    Intent intent = new Intent(c, DetailedPostActivity.class);
-                    String pos = mDataset.get(position).mPos;
+
+                    //String pos = mDataset.get(position).mPos;
 
                     final Bundle bundle = new Bundle();
                     bundle.putString("Title", mDataset.get(position).mTitle);
@@ -149,7 +140,10 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                     bundle.putString("Location", mDataset.get(position).mLoc);
                     bundle.putString("Position", mDataset.get(position).mPos);
 
+                    Intent intent = new Intent(c, DetailedPostActivity.class);
+
                     intent.putExtras(bundle);
+
                     c.startActivity(intent);
                 }
             });
@@ -174,16 +168,19 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+
                     Context c = v.getContext();
+
                     Intent intent = new Intent(c, FullscreenActivity.class);
+
                     intent.putExtras(bundle);
+
                     c.startActivity(intent);
                 }
             });
         }
 
     }
-
 
     // Return the size of your dataset (invoked by the layout manager)
     @Override
@@ -198,28 +195,29 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         notifyDataSetChanged();
     }
 
+
     /**
+     * Attempt to get bitmap from the Memory Cache.
      *
-     * Memory Caching Code
+     * @param key
+     * @return
      */
-    /*
-    public void addBitmapToMemoryCache(String key, Bitmap bitmap) {
-        if (getBitmapFromMemCache(key) == null) {
-            BrowsePostsActivity.mMemoryCache.put(key, bitmap);
-        }
-    }
-    */
     public Bitmap getBitmapFromMemCache(String key) {
 
         return (Bitmap) BrowsePostsActivity.mMemoryCache.get(key);
     }
 
+    /**
+     * Load bitmap from either Memory Cache if found, else create bitmap in background.
+     *
+     * @param photoPathString
+     * @param imageView
+     * @param reqHeight
+     * @param reqWidth
+     */
     public void loadBitmap(String photoPathString, ImageView imageView, int reqHeight, int reqWidth) {
 
-        //final String imageKey = String.valueOf(resId);
-
         final Bitmap bitmap = getBitmapFromMemCache(photoPathString);
-        //Bitmap bitmap = null;
 
         if (bitmap != null) {
 
@@ -227,14 +225,11 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
         } else {
 
-            //imageView.setImageResource(R.drawable.image_placeholder);
-
             BitmapWorkerTask task = new BitmapWorkerTask(imageView, reqHeight, reqWidth);
 
             task.execute(photoPathString);
         }
 
     }
-
 
 }
