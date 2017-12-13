@@ -21,75 +21,9 @@
             android:background="@color/colorGray"
             android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
-        <!-- app:popupTheme="@style/PopupOverlay" -->
 
     </android.support.design.widget.AppBarLayout>
 
-    <!--
-    <android.support.design.widget.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/AppBarOverlay"
-
-        android:visibility="visible">
-    -->
-    <!--
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-
-            android:elevation="4dp"
-
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-            app:popupTheme="@style/PopupOverlay" />
-    -->
-    <!--
-    </android.support.design.widget.AppBarLayout>
-    -->
-
-
-    <!-- The primary full-screen view. This can be replaced with whatever view
-         is needed to present your content, e.g. VideoView, SurfaceView,
-         TextureView, etc. -->
-<!--
-    <TextView
-        android:id="@+id/fullscreen_content"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:keepScreenOn="true"
-        android:textColor="#33b5e5"
-        android:textSize="1sp"
-        android:textStyle="bold"
-        android:text="@string/dummy_content"/>
--->
-    <!--
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-
-            android:background="#89bbc1"
-            >
-
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/detailed_image_recycler_view"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:clickable="true"
-                android:scrollbars="vertical"
-
-                android:paddingLeft="8dp"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp"
-                android:paddingRight="8dp"
-
-                />
-        </LinearLayout>
-    -->
 
     <LinearLayout
         android:id="@+id/fullscreen_content"
@@ -108,43 +42,6 @@
                 />
 
     </LinearLayout>
-
-    <!-- This FrameLayout insets its children based on system windows using
-         android:fitsSystemWindows. -->
-    <!--
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center_horizontal"
-        android:fitsSystemWindows="true">
-
-        <LinearLayout
-            android:id="@+id/fullscreen_content_controls"
-            style="?metaButtonBarStyle"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="bottom|center_horizontal"
-            android:background="@color/black_overlay"
-            android:orientation="vertical"
-            tools:ignore="UselessParent">
-
-            android:layout_gravity="center_vertical|end"
-
-            <Button
-                android:id="@+id/dummy_button"
-                style="?metaButtonBarButtonStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_gravity="center_horizontal"
-                android:text="@string/dummy_button" />
-
-            android:layout_width="0dp"
-
-
-        </LinearLayout>
-    </FrameLayout>
-    -->
 
 
 </LinearLayout>
