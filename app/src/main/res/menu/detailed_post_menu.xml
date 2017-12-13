@@ -8,8 +8,4 @@
         android:background="@color/colorGray"
         app:showAsAction="always"/>
 
-    <!--
-    android:icon="@android:drawable/ic_input_get"
-    -->
-
 </menu>
