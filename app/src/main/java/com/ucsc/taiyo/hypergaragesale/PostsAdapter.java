@@ -4,10 +4,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import java.util.ArrayList;
@@ -16,29 +19,36 @@ import java.util.ArrayList;
  * Created by taiyo on 6/5/17.
  */
 
-public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
+class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
 
     private ArrayList<BrowsePosts> mDataset;
-    String parentShort = "";
-    String photoList = "";
-    int listCameraImageViewSize = 100;
-    int detailedImageViewSize = 1000;
-    int DetailedImageRecyclerViewSize = 3000;
+    private ArrayList<Integer> toRemoveList;
+    private String parentShort = "";
+    private String photoList = "";
+    private int listCameraImageViewSize = 100;
+    private int detailedImageViewSize = 1000;
+    private int DetailedImageRecyclerViewSize = 3000;
+    private boolean editing = false;
+    //public FloatingActionButton mRemove;
 
     // Provide a reference to the views for each data item
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    static class ViewHolder extends RecyclerView.ViewHolder {
 
-        public TextView mTitle;
-        public TextView mPrice;
-        public ImageView mPhoto;
+        TextView mTitle;
+        TextView mPrice;
+        ImageView mPhoto;
+        FloatingActionButton mRemove;
+        ImageView mRemoveMarked;
 
-        public ViewHolder(View view, String parent) {
+        ViewHolder(View view, String parent) {
             super(view);
             mTitle = (TextView) itemView.findViewById(R.id.titleView);
             mPrice = (TextView) itemView.findViewById(R.id.priceView);
 
             if (parent.contains("posts_recycler_view")) {
                 mPhoto = (ImageView) itemView.findViewById(R.id.ListCameraImageView);
+                mRemove = (FloatingActionButton) itemView.findViewById(R.id.removeRow);
+                mRemoveMarked = (ImageView) itemView.findViewById(R.id.markedToRemove);
             }
             if (parent.contains("detailed_recycler_view")) {
                 mPhoto = (ImageView) itemView.findViewById(R.id.DetailedImageView);
@@ -51,9 +61,11 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     }
 
 
-    public PostsAdapter(ArrayList<BrowsePosts> myDataset) {
+    PostsAdapter(ArrayList<BrowsePosts> myDataset) {
 
         mDataset = myDataset;
+
+        toRemoveList = new ArrayList<>();
     }
 
     // Create new views (invoked by the layout manager)
@@ -85,20 +97,43 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             parentShort = "detailed_image_recycler_view";
         }
 
-        ViewHolder vh = new ViewHolder(v, parentShort);
+        return (new ViewHolder(v, parentShort));
 
-        return vh;
     }
 
 
     // Replace the contents of a view (invoked by the layout manager)
     @Override
-    public void onBindViewHolder(ViewHolder holder, final int position) {
-        // - get elements from your dataset at this position
-        // - replace the contents of the views with that elements
+    public void onBindViewHolder(final ViewHolder holder, final int position) {
+
         if (parentShort.contains("posts_recycler_view")) {
             holder.mTitle.setText(mDataset.get(position).mTitle);
             holder.mPrice.setText(mDataset.get(position).mPrice);
+
+            if (editing) {
+                holder.mRemove.show();
+
+                holder.mRemove.setOnClickListener(new View.OnClickListener() {
+
+                    @Override
+                    public void onClick(View view) {
+
+                        holder.mRemove.hide();
+
+                        holder.mRemoveMarked.setVisibility(View.VISIBLE);
+
+                        mDataset.remove(position);
+
+                        toRemoveList.add(position);
+                    }
+                });
+            }
+            else {
+
+                holder.mRemove.hide();
+
+                holder.mRemoveMarked.setVisibility(View.INVISIBLE);
+            }
         }
 
         // get string path from mDataset
@@ -130,8 +165,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                 public void onClick(View v) {
                     Context c = v.getContext();
 
-                    //String pos = mDataset.get(position).mPos;
-
+                    // DetailedPostActivity
                     final Bundle bundle = new Bundle();
                     bundle.putString("Title", mDataset.get(position).mTitle);
                     bundle.putString("Price", mDataset.get(position).mPrice);
@@ -147,6 +181,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                     c.startActivity(intent);
                 }
             });
+
         }
 
         if (parentShort.contains("detailed_recycler_view")) {
@@ -188,11 +223,33 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         return mDataset.size();
     }
 
-    public void setFilter(ArrayList<BrowsePosts> newList) {
+    void setFilter(ArrayList<BrowsePosts> newList) {
+
         mDataset = new ArrayList<>();
+
         mDataset.addAll(newList);
 
         notifyDataSetChanged();
+    }
+
+    void enableRemove(ArrayList<BrowsePosts> newList) {
+
+        mDataset = new ArrayList<>();
+
+        mDataset.addAll(newList);
+
+        editing = true;
+
+        notifyDataSetChanged();
+    }
+
+    ArrayList<Integer> doneRemove() {
+
+        editing = false;
+
+        notifyDataSetChanged();
+
+        return toRemoveList;
     }
 
 
@@ -202,8 +259,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
      * @param key
      * @return
      */
-    public Bitmap getBitmapFromMemCache(String key) {
-
+    private Bitmap getBitmapFromMemCache(String key) {
+        // TODO check get()
         return (Bitmap) BrowsePostsActivity.mMemoryCache.get(key);
     }
 
@@ -215,7 +272,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
      * @param reqHeight
      * @param reqWidth
      */
-    public void loadBitmap(String photoPathString, ImageView imageView, int reqHeight, int reqWidth) {
+    private void loadBitmap(String photoPathString, ImageView imageView, int reqHeight, int reqWidth) {
 
         final Bitmap bitmap = getBitmapFromMemCache(photoPathString);
 
