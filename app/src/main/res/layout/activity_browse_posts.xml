@@ -19,10 +19,13 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@color/colorGray"
-            android:elevation="8dp"
+            android:textSize="12sp"
             android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
 
+        <!--
+        android:elevation="8dp"
+        -->
     </android.support.design.widget.AppBarLayout>
 
 
@@ -33,12 +36,12 @@
         android:id="@+id/fullListButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Full List"
-        android:textSize="10dp"
+        android:text="@string/fullListButton_text_activity_browse_posts"
+        android:textSize="12sp"
         android:layout_gravity="bottom|start" />
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
+        android:id="@+id/addPostFab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
