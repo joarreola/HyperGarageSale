@@ -126,7 +126,7 @@ public class NewPostActivity extends AppCompatActivity {
 
                 if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
 
-                    File photoFile = null;
+                    File photoFile;
 
                     photoFile = getOutputMediaFile();
 
@@ -350,33 +350,7 @@ public class NewPostActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-/*
 
-    private File createImageFile() throws IOException {
-
-        // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-
-        String imageFileName = "JPEG_" + timeStamp + "_";
-
-        File storageDir =
-                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-
-        File image = File.createTempFile(
-                imageFileName,
-                ".jpg",
-                storageDir
-        );
-
-        image = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES), imageFileName + ".jpg");
-
-        // Save a file: path for use with ACTION_VIEW intents
-        mCurrentPhotoPath = image.getAbsolutePath();
-
-        return image;
-    }
-*/
     /**
      * Create a file Uri for saving an image or video.
      */
