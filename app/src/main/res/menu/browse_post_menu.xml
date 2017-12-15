@@ -1,12 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/colorGray">
+
+    <item
+        android:id="@+id/editDone"
+        android:title="@string/EditDone"
+        android:icon="@android:drawable/ic_menu_delete"
+        android:visibility="invisible"
+        app:showAsAction="collapseActionView|ifRoom" />
+
+    <item
+        android:id="@+id/edit"
+        android:title="@string/Edit"
+        android:icon="@android:drawable/ic_menu_edit"
+        app:showAsAction="collapseActionView|ifRoom" />
 
     <item
         android:id="@+id/search"
-        android:title="Search"
+        android:title="@string/Search"
         android:hint="@string/search_hint"
-        android:background="@color/colorGray"
         android:icon="@android:drawable/ic_menu_search"
         app:actionViewClass="android.support.v7.widget.SearchView"
         app:showAsAction="collapseActionView|ifRoom" />
