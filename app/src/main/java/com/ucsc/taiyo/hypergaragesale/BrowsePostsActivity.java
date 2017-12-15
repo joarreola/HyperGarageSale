@@ -43,7 +43,13 @@ public class BrowsePostsActivity extends AppCompatActivity
     private ArrayList<BrowsePosts> browsePosts = new ArrayList<>();
     private RecyclerView mRecyclerView;
     private PostsDbHelper mDbHelper;
-    Button fullListButton;
+    private Button fullListButton;
+    private FloatingActionButton addPostFab;
+    private MenuItem edit;
+    private MenuItem editDone;
+    private ArrayList<Integer> toRemoveList = new ArrayList<>();
+    private int count;
+    MenuItem search;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,9 +102,10 @@ public class BrowsePostsActivity extends AppCompatActivity
      */
     private void setupButtons() {
 
-        // To NewPostActivity button
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        // To-NewPostActivity button
+        addPostFab =
+                (FloatingActionButton) findViewById(R.id.addPostFab);
+        addPostFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
@@ -123,6 +130,7 @@ public class BrowsePostsActivity extends AppCompatActivity
 
             }
         });
+
     }
 
     /**
@@ -233,6 +241,7 @@ public class BrowsePostsActivity extends AppCompatActivity
             } while (cursor.moveToNext());
         }
         db.close();
+        cursor.close();
 
         return browsePosts;
     }
@@ -248,8 +257,12 @@ public class BrowsePostsActivity extends AppCompatActivity
      * @return
      */
     public static File getCacheDir(Context context, String uniqueName) {
-
+        /*
         final String cachePath = Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED
+                || !Environment.isExternalStorageRemovable() ?
+                context.getExternalCacheDir().getPath() : context.getCacheDir().getPath();
+        */
+        final String cachePath = Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)
                 || !Environment.isExternalStorageRemovable() ?
                 context.getExternalCacheDir().getPath() : context.getCacheDir().getPath();
 
@@ -261,7 +274,8 @@ public class BrowsePostsActivity extends AppCompatActivity
 
         getMenuInflater().inflate(R.menu.browse_post_menu, menu);
 
-        MenuItem search = menu.findItem(R.id.search);
+        // search item
+        search = menu.findItem(R.id.search);
 
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(search);
 
@@ -269,12 +283,70 @@ public class BrowsePostsActivity extends AppCompatActivity
 
         searchView.setQueryHint("Enter keyword...");
 
+        // edit item: edit
+        edit = menu.findItem(R.id.edit);
+
+        // edit item: editDone
+        editDone = menu.findItem(R.id.editDone);
+        editDone.setVisible(false);
+
         return true;
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
+        if (item.getItemId() == R.id.edit) {
+            editDone.setVisible(false);
+            edit.setVisible(false);
+        }
+
+        if (item.getItemId() == R.id.edit) {
+
+            // - hide addPostFab button
+            // - disable row clicking on each
+            // - show delete icon on each row
+            addPostFab.hide();
+            edit.setVisible(false);
+            editDone.setVisible(true);
+            search.setVisible(false);
+
+
+            mAdapter.enableRemove(browsePosts);
+        }
+
+        if (item.getItemId() == R.id.editDone) {
+            addPostFab.show();
+            edit.setVisible(true);
+            editDone.setVisible(false);
+            search.setVisible(true);
+
+            // row numbers to remove
+            toRemoveList = mAdapter.doneRemove();
+
+            db = mDbHelper.getWritableDatabase();
+
+            String table = Posts.PostEntry.TABLE_NAME;
+            String whereClause = "_id=?";
+            for (Integer row : toRemoveList) {
+                // prune database
+                String[] whereArgs = new String[]{String.valueOf(row)};
+                db.delete(table, whereClause, whereArgs);
+
+                //prune browsePosts. For accurate search results
+                boolean removedRes = browsePosts.remove(row);
+
+            }
+
+            db.close();
+            /*
+            db = mDbHelper.getReadableDatabase();
+            ArrayList<BrowsePosts> array = new ArrayList<>();
+            array = getDataSet();
+            mAdapter = new PostsAdapter(array);
+            */
+        }
         return super.onOptionsItemSelected(item);
 
     }
