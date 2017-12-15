@@ -5,7 +5,10 @@
     <string name="desc_hint">Enter description of the item</string>
     <string name="button_post">Post</string>
     <string name="new_post_snackbar">Thanks for posting!</string>
+
     <string name="title_activity_browse_posts">BrowsePostActivity</string>
+    <string name="fullListButton_text_activity_browse_posts">Full List</string>
+
     <string name="title_activity_detailed_post">DetailedPostActivity</string>
 
     <string name="title_activity_fullscreen">FullscreenActivity</string>
@@ -16,4 +19,12 @@
     <string name="title_header">Title: </string>
     <string name="price_header">Price: </string>
     <string name="description_header">Description: </string>
+
+    <string name="EditDone">EditDone</string>
+    <string name="Edit">Edit</string>
+    <string name="Search">Search</string>
+
+    <string name="desc1_post_text_view">Holds first photo image</string>
+    <string name="desc2_post_text_view">A red X to replace edit pencil in row</string>
+
 </resources>
