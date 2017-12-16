@@ -65,19 +65,15 @@
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true">
 
-            <ImageView
-                android:id="@+id/markedToRemove"
-                android:contentDescription="@string/desc2_post_text_view"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:paddingLeft="8dp"
-                android:paddingRight="8dp"
-                android:paddingStart="8dp"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp"
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/cancelRemoveRow"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
                 android:layout_gravity="top|end"
                 android:visibility="invisible"
-                app:srcCompat="@android:drawable/ic_delete"
+                android:paddingBottom="16dp"
+                android:clickable="true"
+                app:srcCompat="@android:drawable/ic_input_add"
                 />
 
             <android.support.design.widget.FloatingActionButton
