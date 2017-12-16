@@ -185,28 +185,6 @@ public class NewPostActivity extends AppCompatActivity {
 
     // TODO: disable location updates when app not active
 
-    /**
-     *
-     * @param mImageView
-     */
-    public void grabImage(ImageView mImageView)
-    {
-        this.getContentResolver().notifyChange(photoURI, null);
-
-        ContentResolver cr = this.getContentResolver();
-
-        try
-        {
-
-            // load image in background
-            loadBitmap(mImageView, imageViewWidth, imageViewHeight);
-        }
-        catch (Exception e)
-        {
-            Log.e("Failed to load", e.getMessage());
-        }
-
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
@@ -265,6 +243,29 @@ public class NewPostActivity extends AppCompatActivity {
             //  note that we got the image from the picture gallery
             fromGallery = true;
         }
+    }
+
+    /**
+     *
+     * @param mImageView
+     */
+    public void grabImage(ImageView mImageView)
+    {
+        this.getContentResolver().notifyChange(photoURI, null);
+
+        ContentResolver cr = this.getContentResolver();
+
+        try
+        {
+
+            // load image in background
+            loadBitmap(mImageView, imageViewWidth, imageViewHeight);
+        }
+        catch (Exception e)
+        {
+            Log.e("Failed to load", e.getMessage());
+        }
+
     }
 
     /**

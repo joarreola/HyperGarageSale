@@ -89,6 +89,7 @@ public class FullscreenActivity extends AppCompatActivity {
         for (String path : photoPath.split(" ")) {
 
             fullSizePhotos.add(new BrowsePosts(
+                    "_ID",
                     title,
                     price,
                     path,

@@ -182,6 +182,7 @@ public class DetailedPostActivity extends AppCompatActivity implements OnMapRead
     public ArrayList<BrowsePosts> getDataSet(int position) {
 
         String[] projection = {
+                Posts.PostEntry._ID,
                 Posts.PostEntry.COLUMN_NAME_TITLE,
                 Posts.PostEntry.COLUMN_NAME_PRICE,
                 Posts.PostEntry.COLUMN_NAME_PHOTO,
@@ -222,6 +223,7 @@ public class DetailedPostActivity extends AppCompatActivity implements OnMapRead
             for (String photoPath : cursor.getString(photoInt).split(" ")) {
 
                 detailedPost.add(new BrowsePosts(
+                        cursor.getString(cursor.getColumnIndex(Posts.PostEntry._ID)),
                         cursor.getString(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_TITLE)),
                         cursor.getString(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_PRICE)),
                         photoPath,

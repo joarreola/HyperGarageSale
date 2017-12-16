@@ -22,14 +22,13 @@ import java.util.ArrayList;
 class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
 
     private ArrayList<BrowsePosts> mDataset;
-    private ArrayList<Integer> toRemoveList;
+    private ArrayList<String> toRemoveList;
     private String parentShort = "";
     private String photoList = "";
     private int listCameraImageViewSize = 100;
     private int detailedImageViewSize = 1000;
     private int DetailedImageRecyclerViewSize = 3000;
-    private boolean editing = false;
-    //public FloatingActionButton mRemove;
+    public static boolean editing = false;
 
     // Provide a reference to the views for each data item
     static class ViewHolder extends RecyclerView.ViewHolder {
@@ -38,7 +37,7 @@ class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
         TextView mPrice;
         ImageView mPhoto;
         FloatingActionButton mRemove;
-        ImageView mRemoveMarked;
+        FloatingActionButton mCancelRemoveRow;
 
         ViewHolder(View view, String parent) {
             super(view);
@@ -48,7 +47,8 @@ class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
             if (parent.contains("posts_recycler_view")) {
                 mPhoto = (ImageView) itemView.findViewById(R.id.ListCameraImageView);
                 mRemove = (FloatingActionButton) itemView.findViewById(R.id.removeRow);
-                mRemoveMarked = (ImageView) itemView.findViewById(R.id.markedToRemove);
+                mCancelRemoveRow =
+                        (FloatingActionButton) itemView.findViewById(R.id.cancelRemoveRow);
             }
             if (parent.contains("detailed_recycler_view")) {
                 mPhoto = (ImageView) itemView.findViewById(R.id.DetailedImageView);
@@ -65,7 +65,6 @@ class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
 
         mDataset = myDataset;
 
-        toRemoveList = new ArrayList<>();
     }
 
     // Create new views (invoked by the layout manager)
@@ -111,6 +110,10 @@ class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
             holder.mPrice.setText(mDataset.get(position).mPrice);
 
             if (editing) {
+
+                // disable row-clickability
+                holder.itemView.setClickable(false);
+
                 holder.mRemove.show();
 
                 holder.mRemove.setOnClickListener(new View.OnClickListener() {
@@ -118,21 +121,40 @@ class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
                     @Override
                     public void onClick(View view) {
 
-                        holder.mRemove.hide();
+                        holder.mRemove.setVisibility(View.INVISIBLE);
 
-                        holder.mRemoveMarked.setVisibility(View.VISIBLE);
+                        holder.mCancelRemoveRow.show();
 
-                        mDataset.remove(position);
+                        String rowID = mDataset.get(position).mID;
+                        toRemoveList.add(rowID);
+                    }
+                });
 
-                        toRemoveList.add(position);
+                holder.mCancelRemoveRow.setOnClickListener(new View.OnClickListener() {
+
+                    @Override
+                    public void onClick(View view) {
+
+                        holder.mCancelRemoveRow.setVisibility(View.INVISIBLE);
+
+                        holder.mRemove.show();
+
+                        String rowID = mDataset.get(position).mID;
+                        int index = toRemoveList.indexOf(rowID);
+
+                        toRemoveList.remove(index);
                     }
                 });
             }
             else {
 
+                // enable row-clickability
+                holder.itemView.setClickable(true);
+
                 holder.mRemove.hide();
 
-                holder.mRemoveMarked.setVisibility(View.INVISIBLE);
+                //holder.mCancelRemoveRow.setVisibility(View.INVISIBLE);
+                holder.mCancelRemoveRow.hide();
             }
         }
 
@@ -156,9 +178,10 @@ class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
                     DetailedImageRecyclerViewSize);
         }
 
-        if (parentShort.contains("posts_recycler_view")) {
+        if (parentShort.contains("posts_recycler_view") && !editing) {
 
             // Launch DetailedPost Activity when clicking on a BrowsePost Row.
+            // TODO: Disable when in edit mode.
             holder.itemView.setOnClickListener(new View.OnClickListener() {
 
                 @Override
@@ -232,22 +255,18 @@ class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
         notifyDataSetChanged();
     }
 
-    void enableRemove(ArrayList<BrowsePosts> newList) {
-
-        mDataset = new ArrayList<>();
-
-        mDataset.addAll(newList);
+    void enableRemove() {
 
         editing = true;
+
+        toRemoveList = new ArrayList<>();
 
         notifyDataSetChanged();
     }
 
-    ArrayList<Integer> doneRemove() {
+    ArrayList<String> doneRemove() {
 
         editing = false;
-
-        notifyDataSetChanged();
 
         return toRemoveList;
     }

@@ -11,8 +11,9 @@ public class BrowsePosts {
     public String mDesc;
     public String mLoc;
     public String mPos;
+    public String mID;
 
-    public BrowsePosts (String title, String price, String photo, String description,
+    public BrowsePosts (String rowID, String title, String price, String photo, String description,
                         String location, String position) {
         mTitle = title;
         mPrice = price;
@@ -20,5 +21,6 @@ public class BrowsePosts {
         mDesc = description;
         mLoc = location;
         mPos = position;
+        mID = rowID;
     }
 }

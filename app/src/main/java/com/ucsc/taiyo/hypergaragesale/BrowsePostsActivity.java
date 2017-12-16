@@ -47,7 +47,7 @@ public class BrowsePostsActivity extends AppCompatActivity
     private FloatingActionButton addPostFab;
     private MenuItem edit;
     private MenuItem editDone;
-    private ArrayList<Integer> toRemoveList = new ArrayList<>();
+    private ArrayList<String> toRemoveList = new ArrayList<>();
     private int count;
     MenuItem search;
 
@@ -192,6 +192,7 @@ public class BrowsePostsActivity extends AppCompatActivity
     public ArrayList<BrowsePosts> getDataSet() {
 
         String[] projection = {
+                Posts.PostEntry._ID,
                 Posts.PostEntry.COLUMN_NAME_TITLE,
                 Posts.PostEntry.COLUMN_NAME_PRICE,
                 Posts.PostEntry.COLUMN_NAME_PHOTO,
@@ -229,6 +230,7 @@ public class BrowsePostsActivity extends AppCompatActivity
                 }
 
                 browsePosts.add( new BrowsePosts(
+                        cursor.getString(cursor.getColumnIndex(Posts.PostEntry._ID)),
                         cursor.getString(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_TITLE)),
                         cursor.getString(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_PRICE)),
                         cursor.getString(cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_PHOTO)),
@@ -304,48 +306,59 @@ public class BrowsePostsActivity extends AppCompatActivity
 
         if (item.getItemId() == R.id.edit) {
 
-            // - hide addPostFab button
-            // - disable row clicking on each
-            // - show delete icon on each row
+            // display only garbage-can in toolbar, hide the addPostFab button
             addPostFab.hide();
             edit.setVisible(false);
             editDone.setVisible(true);
             search.setVisible(false);
 
-
-            mAdapter.enableRemove(browsePosts);
+            // display edit pencil in each row
+            mAdapter.enableRemove();
         }
 
         if (item.getItemId() == R.id.editDone) {
+
+            // display edit pencil and search in toolbar, show the addPostFab button
             addPostFab.show();
             edit.setVisible(true);
             editDone.setVisible(false);
             search.setVisible(true);
 
-            // row numbers to remove
+            // row numbers tagged for removal
             toRemoveList = mAdapter.doneRemove();
 
             db = mDbHelper.getWritableDatabase();
+            int preCount = getDatabaseCount(db);
+            ArrayList<String> dbRows = getDatabaseRowIDs(db);
 
             String table = Posts.PostEntry.TABLE_NAME;
             String whereClause = "_id=?";
-            for (Integer row : toRemoveList) {
+            int delInt;
+            for (String row : toRemoveList) {
+
                 // prune database
-                String[] whereArgs = new String[]{String.valueOf(row)};
-                db.delete(table, whereClause, whereArgs);
+                String[] whereArgs = new String[]{row};
 
-                //prune browsePosts. For accurate search results
-                boolean removedRes = browsePosts.remove(row);
+                if (db.delete(table, whereClause, whereArgs) == 0) {
 
+                    Log.d("HyperGarageSale", "failed to delete row: " + row);
+
+                }
+                else {
+
+                    Log.d("HyperGarageSale", "deleted row: " + String.valueOf(row));
+                }
             }
+            int postCount = getDatabaseCount(db);
+            dbRows = getDatabaseRowIDs(db);
+
+            // refresh browsePosts for search
+            browsePosts = getDataSet();
+
+            // update RecyclerView dataSet
+            mAdapter.setFilter(browsePosts);
 
             db.close();
-            /*
-            db = mDbHelper.getReadableDatabase();
-            ArrayList<BrowsePosts> array = new ArrayList<>();
-            array = getDataSet();
-            mAdapter = new PostsAdapter(array);
-            */
         }
         return super.onOptionsItemSelected(item);
 
@@ -381,4 +394,68 @@ public class BrowsePostsActivity extends AppCompatActivity
         return false;
     }
 
+    public Integer getDatabaseCount(SQLiteDatabase db) {
+
+        String[] projection = {
+                Posts.PostEntry._ID,
+                Posts.PostEntry.COLUMN_NAME_TITLE,
+                Posts.PostEntry.COLUMN_NAME_PRICE,
+                Posts.PostEntry.COLUMN_NAME_PHOTO,
+                Posts.PostEntry.COLUMN_NAME_DESCRIPTION,
+                Posts.PostEntry.COLUMN_NAME_LOCATION,
+        };
+
+        String sortOrder =
+                Posts.PostEntry.COLUMN_NAME_PRICE + " DESC";
+
+        Cursor cursor = db.query(
+                Posts.PostEntry.TABLE_NAME,  // The table to query
+                projection,                               // The columns to return
+                null,                                     // The columns for the WHERE clause
+                null,                                     // The values for the WHERE clause
+                null,                                     // don't group the rows
+                null,                                     // don't filter by row groups
+                sortOrder                                 // The sort order
+        );
+
+        return cursor.getCount();
+    }
+
+    public ArrayList<String> getDatabaseRowIDs(SQLiteDatabase db) {
+
+        String[] projection = {
+                Posts.PostEntry._ID,
+                Posts.PostEntry.COLUMN_NAME_TITLE,
+                Posts.PostEntry.COLUMN_NAME_PRICE,
+                Posts.PostEntry.COLUMN_NAME_PHOTO,
+                Posts.PostEntry.COLUMN_NAME_DESCRIPTION,
+                Posts.PostEntry.COLUMN_NAME_LOCATION,
+        };
+
+        String sortOrder =
+                Posts.PostEntry.COLUMN_NAME_PRICE + " DESC";
+
+        Cursor cursor = db.query(
+                Posts.PostEntry.TABLE_NAME,  // The table to query
+                projection,                               // The columns to return
+                null,                                     // The columns for the WHERE clause
+                null,                                     // The values for the WHERE clause
+                null,                                     // don't group the rows
+                null,                                     // don't filter by row groups
+                sortOrder                                 // The sort order
+        );
+
+        ArrayList<String> rows = new ArrayList<>();
+
+        if (cursor.moveToFirst()) {
+
+            do {
+
+                rows.add(cursor.getString(cursor.getColumnIndex(Posts.PostEntry._ID)));
+
+            } while (cursor.moveToNext());
+        }
+
+        return rows;
+    }
 }

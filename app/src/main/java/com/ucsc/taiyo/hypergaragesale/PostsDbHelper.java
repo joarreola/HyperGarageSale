@@ -12,10 +12,11 @@ public class PostsDbHelper extends SQLiteOpenHelper {
 
     // If you change the database schema, you must increment the database version.
     public static final int DATABASE_VERSION = 1;
-    public static final String DATABASE_NAME = "Posts.db10";
+    public static final String DATABASE_NAME = "Posts.db";
 
     private static final String TEXT_TYPE = " TEXT";
     private static final String COMMA_SEP = ",";
+
     private static final String SQL_CREATE_ENTRIES =
             "CREATE TABLE " + Posts.PostEntry.TABLE_NAME + " (" +
                     Posts.PostEntry._ID + " INTEGER PRIMARY KEY," +
