@@ -1,6 +1,7 @@
 package com.ucsc.taiyo.hypergaragesale;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.Address;
@@ -22,6 +23,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class DetailedPostActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -35,6 +37,8 @@ public class DetailedPostActivity extends AppCompatActivity implements OnMapRead
     TextView locText;
     String locationString;
     String title;
+    String price;
+    String desc;
     String photo;
     String[] loc;
     List<Address> addresses = null;
@@ -43,6 +47,18 @@ public class DetailedPostActivity extends AppCompatActivity implements OnMapRead
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+
+        // manage stateful startedApp flags
+        /*
+        if (!isTaskRoot()) {
+            Intent intent = getIntent();
+            String action = intent.getAction();
+            if (intent.hasCategory(Intent.CATEGORY_LAUNCHER) && action != null && action.equals(Intent.ACTION_MAIN)) {
+                finish();
+                return;
+            }
+        }
+        */
 
         setContentView(R.layout.activity_detailed_post);
 
@@ -59,21 +75,20 @@ public class DetailedPostActivity extends AppCompatActivity implements OnMapRead
         // to get back to BrowsePostsActivity
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        Intent intent = this.getIntent();
 
-        // Unpack bundle contents
-        if (savedInstanceState == null) {
+        extras = intent.getExtras();
 
-            Intent intent = this.getIntent();
-
-            extras = intent.getExtras();
-
-            titleText.append(extras.getString("Title"));
+        if (extras != null) {
 
             title = extras.getString("Title");
+            titleText.append(title);
 
-            priceText.append(extras.getString("Price"));
+            price = extras.getString("Price");
+            priceText.append(price);
 
-            descText.append(extras.getString("Desc"));
+            desc = extras.getString("Desc");
+            descText.append(desc);
 
             position = extras.getString("Position");
 
@@ -82,6 +97,28 @@ public class DetailedPostActivity extends AppCompatActivity implements OnMapRead
             loc = locationString.split(",");
 
             photo = extras.getString("Photo");
+
+        }
+        else {
+
+            SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+
+            title = preferences.getString("Title", title);
+            titleText.append(title);
+
+            price = preferences.getString("Price", price);
+            priceText.append(price);
+
+            desc = preferences.getString("Desc", desc);
+            descText.append(desc);
+
+            position = preferences.getString("Position", position);
+
+            locationString = preferences.getString("Location", locationString);
+
+            loc = locationString.split(",");
+
+            photo = preferences.getString("Photo", photo);
         }
 
         // setup the photos-only detailed_recycler_view RecyclerView
@@ -94,6 +131,86 @@ public class DetailedPostActivity extends AppCompatActivity implements OnMapRead
 
         mapFragment.getMapAsync(this);
 
+    }
+
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // User returns to activity after onPause()
+        // Next: onPause()
+
+        mAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+
+        // User navigates to activity after onStop()
+        // Next: onStart()
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        // from onRestart(), after onStop()
+        // Next: onResume() or onStop()
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        // Another activity comes into the foreground
+        // Next: onResume() or onStop()
+
+        SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+
+        editor.putString("Title", title);
+
+        editor.putString("Price", price);
+
+        editor.putString("Desc", desc);
+
+        editor.putString("Position", position);
+
+        editor.putString("Location", locationString);
+
+        editor.putString("Photo", photo);
+
+        // Commit to storage
+        editor.commit();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        // After onPause(), activity is no longer visible
+        // Next: onRestart() or onDestroy()
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        // From onStop()
+        // Next: nothing
     }
 
     /**
@@ -164,13 +281,6 @@ public class DetailedPostActivity extends AppCompatActivity implements OnMapRead
         }
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        mAdapter.notifyDataSetChanged();
-    }
-
     /**
      * Populate ArrayList detailedPost with a single DataBase position.
      * This will be the dataset for a photos-only RecyclerView, to be displayed
@@ -208,7 +318,7 @@ public class DetailedPostActivity extends AppCompatActivity implements OnMapRead
         if (cursor.moveToPosition(position)) {
 
             // validate location data
-            locationString = "NO LOCATION";
+            //locationString = "NO LOCATION";
 
             int locationInt = cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_LOCATION);
 
