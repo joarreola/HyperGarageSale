@@ -7,11 +7,15 @@ import android.database.sqlite.SQLiteDatabase;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.TextView;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -42,6 +46,8 @@ public class DetailedPostActivity extends AppCompatActivity implements OnMapRead
     String photo;
     String[] loc;
     List<Address> addresses = null;
+    private MenuItem edit;
+    private MenuItem save;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -349,4 +355,41 @@ public class DetailedPostActivity extends AppCompatActivity implements OnMapRead
         return detailedPost;
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        getMenuInflater().inflate(R.menu.detailed_post_menu, menu);
+
+        // edit item: edit
+        edit = menu.findItem(R.id.edit);
+
+        // edit item: editDone
+        save = menu.findItem(R.id.save);
+        save.setVisible(false);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        if (item.getItemId() == R.id.edit) {
+
+            // display only save icon in toolbar
+            edit.setVisible(false);
+            save.setVisible(true);
+
+        }
+
+        if (item.getItemId() == R.id.save) {
+
+            // re-display edit pencil and search in toolbar
+            edit.setVisible(true);
+            save.setVisible(false);
+
+           // TODO: Create a singleTop EditDetailedPostActivity
+        }
+        return super.onOptionsItemSelected(item);
+
+    }
 }
