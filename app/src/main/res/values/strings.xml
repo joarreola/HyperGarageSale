@@ -10,7 +10,7 @@
     <string name="fullListButton_text_activity_browse_posts">Full List</string>
 
     <string name="title_activity_detailed_post">DetailedPostActivity</string>
-    <string name="to_full_size_activity_detailed_post">Click photos to see Full-size</string>
+    <string name="to_full_size_activity_detailed_post">Click photos area to see Full-size</string>
 
     <string name="title_activity_fullscreen">FullscreenActivity</string>
     <string name="dummy_button">Dummy Button</string>
