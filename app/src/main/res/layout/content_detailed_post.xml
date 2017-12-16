@@ -117,29 +117,31 @@
     <TextView
         android:id="@+id/toFullSizeImages"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:paddingTop="4dp"
-        android:paddingBottom="4dp"
+        android:paddingBottom="16dp"
         android:paddingRight="4dp"
         android:layout_gravity="end"
+        android:layout_marginBottom="4dp"
         android:text="@string/to_full_size_activity_detailed_post"
         android:layout_weight="0.02"
+        android:textSize="12sp"
         android:background="@android:color/background_light" />
 
     <GridLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="300dp" >
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/detailed_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:clickable="false"
+            android:clickable="true"
             android:scrollbars="vertical"
-            android:paddingLeft="8dp"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-            android:paddingRight="8dp"
+            android:paddingLeft="4dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:paddingRight="4dp"
             />
 
     </GridLayout>
