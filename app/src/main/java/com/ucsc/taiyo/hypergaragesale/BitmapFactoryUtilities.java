@@ -40,7 +40,6 @@ public class BitmapFactoryUtilities {
         options.inJustDecodeBounds = false;
 
         return BitmapFactory.decodeFile(file, options);
-
     }
 
     public static Bitmap decodeSampledBitmapFromInputStream(InputStream inputStream,
