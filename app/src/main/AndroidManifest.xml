@@ -13,11 +13,7 @@
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-<!--
-    <uses-feature
-        android:glEsVersion="0x00020000“
-        android:required="true"/>
--->
+
 
     <application
         android:allowBackup="true"
@@ -41,9 +37,6 @@
             android:parentActivityName=".BrowsePostsActivity">
         </activity>
 
-        <!--
-        android:launchMode="singleTop"
-        -->
 
         <activity android:name=".BrowsePostsActivity"
             android:label="BrowsePostsActivity"
@@ -52,15 +45,12 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-<!--
-            <intent-filter>
-                <action android:name="android.intent.action.SEARCH" />
-            </intent-filter>
--->
+
             <meta-data android:name="android.app.searchable"
                 android:resource="@xml/searchable"/>
 
         </activity>
+
 
         <activity
             android:name=".DetailedPostActivity"
@@ -79,47 +69,17 @@
 
         </activity>
 
+
         <activity
             android:name=".FullscreenActivity"
-            android:label="@string/title_activity_fullscreen"
-            android:parentActivityName=".BrowsePostsActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.ucsc.taiyo.hypergaragesale.BrowsePostsActivity" />
-        </activity>
-
-<!--
-        <activity android:name=".SearchResultsActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.SEARCH" />
-            </intent-filter>
-
-        </activity>
--->
-        <!--
-        <activity android:name=".SearchableActivity" >
-            <intent-filter>
-                <action android:name="android.intent.action.SEARCH" />
-            </intent-filter>
-
-            <meta-data android:name="android.app.searchable"
-                android:resource="@xml/searchable"/>
-
-        </activity>
-        -->
-<!--
-        <activity
-            android:name=".FullscreenActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_fullscreen"
             android:parentActivityName=".DetailedPostActivity"
-            android:theme="@style/FullscreenTheme">
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.ucsc.taiyo.hypergaragesale.DetailedPostActivity" />
         </activity>
--->
+
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
