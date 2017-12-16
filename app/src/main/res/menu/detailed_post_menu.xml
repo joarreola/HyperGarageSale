@@ -3,9 +3,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">>
 
     <item
-        android:id="@+id/action_detailed_post"
-        android:title="MAP"
-        android:background="@color/colorGray"
-        app:showAsAction="always"/>
+        android:id="@+id/save"
+        android:title="@string/EditDone"
+        android:icon="@android:drawable/ic_menu_save"
+        android:visibility="invisible"
+        app:showAsAction="collapseActionView|ifRoom" />
+
+    <item
+        android:id="@+id/edit"
+        android:title="@string/Edit"
+        android:icon="@android:drawable/ic_menu_edit"
+        app:showAsAction="collapseActionView|ifRoom" />
 
 </menu>
