@@ -44,17 +44,26 @@ class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
             mTitle = (TextView) itemView.findViewById(R.id.titleView);
             mPrice = (TextView) itemView.findViewById(R.id.priceView);
 
-            if (parent.contains("posts_recycler_view")) {
+            if (parent.equals("posts_recycler_view")) {
                 mPhoto = (ImageView) itemView.findViewById(R.id.ListCameraImageView);
                 mRemove = (FloatingActionButton) itemView.findViewById(R.id.removeRow);
                 mCancelRemoveRow =
                         (FloatingActionButton) itemView.findViewById(R.id.cancelRemoveRow);
             }
-            if (parent.contains("detailed_recycler_view")) {
+
+
+            // detailed activity image views
+            if (parent.equals("detailed_recycler_view")) {
                 mPhoto = (ImageView) itemView.findViewById(R.id.DetailedImageView);
             }
-            if (parent.contains("detailed_image_recycler_view")) {
+
+            if (parent.equals("detailed_image_recycler_view")) {
                 mPhoto = (ImageView) itemView.findViewById(R.id.DetailedImageRecyclerView);
+            }
+
+            // detailed-edit activity image views
+            if (parent.equals("edit_detailed_recycler_view")) {
+                mPhoto = (ImageView) itemView.findViewById(R.id.EditDetailedImageView);
             }
 
         }
@@ -81,13 +90,34 @@ class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
 
             parentShort = "posts_recycler_view";
         }
-        if (parentString.contains("detailed_recycler_view")) {
+
+        // match edit_ first
+        if (parentString.contains("edit_detailed_recycler_view")) {
+            // create a new view
+            v = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.edit_detailed_image_view, parent, false);
+
+            parentShort = "edit_detailed_recycler_view";
+        }
+        else if (parentString.contains("detailed_recycler_view")) {
             // create a new view
             v = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.detailed_image_view, parent, false);
 
             parentShort = "detailed_recycler_view";
         }
+
+        // match edit_ first
+        /*
+        if (parentString.contains("edit_detailed_image_recycler_view")) {
+            // create a new view
+            v = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.edit_detailed_image_recycler_view, parent, false);
+
+            parentShort = "edit_detailed_image_recycler_view";
+        }
+        else
+        */
         if (parentString.contains("detailed_image_recycler_view")) {
             // create a new view
             v = LayoutInflater.from(parent.getContext())
@@ -95,6 +125,7 @@ class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
 
             parentShort = "detailed_image_recycler_view";
         }
+
 
         return (new ViewHolder(v, parentShort));
 
@@ -105,7 +136,7 @@ class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
 
-        if (parentShort.contains("posts_recycler_view")) {
+        if (parentShort.equals("posts_recycler_view")) {
             holder.mTitle.setText(mDataset.get(position).mTitle);
             holder.mPrice.setText(mDataset.get(position).mPrice);
 
@@ -162,26 +193,29 @@ class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
         String photoPathString = mDataset.get(position).mPhoto;
 
         // photoPathString: use as Mem Cache image key.
-        if (parentShort.contains("posts_recycler_view")) {
+        if (parentShort.equals("posts_recycler_view")) {
             String pS[] = photoPathString.split(" ");
             //holder.mPhoto.invalidate();
             //holder.mPhoto.clearAnimation();
             loadBitmap(pS[0], holder.mPhoto, listCameraImageViewSize,
                     listCameraImageViewSize);
         }
-        if (parentShort.contains("detailed_recycler_view")) {
+        if (parentShort.equals("detailed_recycler_view")) {
             loadBitmap(photoPathString, holder.mPhoto, detailedImageViewSize,
                     detailedImageViewSize);
         }
-        if (parentShort.contains("detailed_image_recycler_view")) {
+        if (parentShort.equals("edit_detailed_recycler_view")) {
+            loadBitmap(photoPathString, holder.mPhoto, detailedImageViewSize,
+                    detailedImageViewSize);
+        }
+        if (parentShort.equals("detailed_image_recycler_view")) {
             loadBitmap(photoPathString, holder.mPhoto, DetailedImageRecyclerViewSize,
                     DetailedImageRecyclerViewSize);
         }
 
-        if (parentShort.contains("posts_recycler_view") && !editing) {
+        if (parentShort.equals("posts_recycler_view") && !editing) {
 
             // Launch DetailedPost Activity when clicking on a BrowsePost Row.
-            // TODO: Disable when in edit mode.
             holder.itemView.setOnClickListener(new View.OnClickListener() {
 
                 @Override
@@ -196,6 +230,7 @@ class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
                     bundle.putString("Photo", mDataset.get(position).mPhoto);
                     bundle.putString("Location", mDataset.get(position).mLoc);
                     bundle.putString("Position", mDataset.get(position).mPos);
+                    bundle.putString("RowID", mDataset.get(position).mID);
 
                     Intent intent = new Intent(c, DetailedPostActivity.class);
 
@@ -207,7 +242,7 @@ class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
 
         }
 
-        if (parentShort.contains("detailed_recycler_view")) {
+        if (parentShort.equals("detailed_recycler_view")) {
             // package entry info in a bundle, pass via extras
             final Bundle bundle = new Bundle();
             bundle.putString("Title", mDataset.get(position).mTitle);
@@ -236,6 +271,10 @@ class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
                     c.startActivity(intent);
                 }
             });
+        }
+
+        if (parentShort.equals("edit_detailed_recycler_view")) {
+            photoPathString = mDataset.get(position).mPhoto;
         }
 
     }
@@ -284,14 +323,16 @@ class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
     }
 
     /**
-     * Load bitmap from either Memory Cache if found, else create bitmap in background.
+     * Load bitmap from either Memory Cache if found, else create
+     * bitmap in background.
      *
      * @param photoPathString
      * @param imageView
      * @param reqHeight
      * @param reqWidth
      */
-    private void loadBitmap(String photoPathString, ImageView imageView, int reqHeight, int reqWidth) {
+    private void loadBitmap(String photoPathString, ImageView imageView,
+                            int reqHeight, int reqWidth) {
 
         final Bitmap bitmap = getBitmapFromMemCache(photoPathString);
 
