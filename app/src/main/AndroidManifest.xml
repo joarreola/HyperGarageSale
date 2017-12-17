@@ -81,6 +81,17 @@
         </activity>
 
 
+        <activity
+            android:name=".EditDetailedPostActivity"
+            android:label="@string/title_activity_edit_detailed_post"
+            android:parentActivityName=".DetailedPostActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.ucsc.taiyo.hypergaragesale.DetailedPostActivity" />
+        </activity>
+
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyApLW9TqqvjkEfR9QwjuGjQVp8FWbeYAs8"/>
