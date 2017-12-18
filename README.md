@@ -3,6 +3,8 @@ Form UCSC-Extention class by Taral Oza
 
 Implemented Functionality:
 
+- Post search by Title.
+
 - Post Addition, with multiple image support.
 
 - Post removal.
