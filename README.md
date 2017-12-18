@@ -1,26 +1,19 @@
 # HyperGarageSale
 Form UCSC-Extention class by Taral Oza
 
-Bugs:
+Implemented Functionality:
 
+- Post Addition, with multiple image support.
 
+- Post removal.
 
-Recent changes:
+- Detailed Post view.
 
-1- Enabled synchronization in the disk-caching code. Though, need to figure out
-   where mDiskCacheStarting is set to false.
-   
-2- Added Full List button to get back to full list from a search result.
-   
-   
-TO DO:
+- Full-size image view from Detailed Post view.
 
-1- fix bugs
+- Detailed Post Edit, with image removal and addition.
 
-2- Add row-editing functionality in BrowesePostsActivity to remove a row.
+- Memory and Disk caching of bitmaps.
 
-3- Add Content-editing functionality in DetailedPostActvity to edit any field, and to remove
-   or add photo images.
-   
-4- Clean up code.
+- All BitmapFactory operations on AsyncTasks.
 
