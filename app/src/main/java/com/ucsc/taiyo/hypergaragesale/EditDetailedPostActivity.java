@@ -1,6 +1,7 @@
 package com.ucsc.taiyo.hypergaragesale;
 
 import android.Manifest;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -11,10 +12,15 @@ import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -23,13 +29,20 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.SupportMapFragment;
 
+import java.io.File;
 import java.lang.reflect.Array;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
 
 /**
  * Created by taiyo on 12/16/17.
@@ -53,7 +66,7 @@ public class EditDetailedPostActivity extends AppCompatActivity {
     private String RowID;
     private String[] loc;
     private MenuItem save;
-    ArrayList<String> imagesArray = new ArrayList<>();
+    ArrayList<String> imagesArray;
     ArrayList<String> imagesToRemove = new ArrayList<>();
 
     String serviceString = Context.LOCATION_SERVICE;
@@ -62,9 +75,19 @@ public class EditDetailedPostActivity extends AppCompatActivity {
     Location location;
     int t = 5000;       //milliseconds
     float distance = 5; // meters
+    int imageViewWidth = 500;
+    int imageViewHeight = 500;
 
     static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 1;
     static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 2;
+
+    FloatingActionButton imageAddfab;
+    Uri photoURI;
+    static final int REQUEST_TAKE_PHOTO = 1;
+    static final int RESULT_LOAD_IMAGE = 2;
+    String mCurrentPhotoPath;
+    Boolean fromGallery = false;
+    ImageView mImageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +104,7 @@ public class EditDetailedPostActivity extends AppCompatActivity {
         titleText = (EditText)findViewById(R.id.textView_title);
         descText = (EditText)findViewById(R.id.textView_desc);
         priceText = (EditText)findViewById(R.id.textView_price);
+        mImageView = (ImageView) findViewById(R.id.CameraImageView);
 
         // to get back to DetailedPostActivity
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -115,11 +139,19 @@ public class EditDetailedPostActivity extends AppCompatActivity {
         // setup the photos-only edit_detailed_recycler_view RecyclerView
         setupRecyclerView();
 
+        // setup up the camera and gallery buttons
+        setupButtons();
+
         // Location via not-fusedLocationProvider
         locationManager = (LocationManager)getSystemService(serviceString);
 
-        // Add image path to ArrayList imagesArray
+        // Initialize imagesArray to passed-in photo paths.
+        // Add to imagesArray in fab handler.
         imagesArray = new ArrayList<>();
+        for (String path : photo.split(" ")) {
+
+            imagesArray.add(path);
+        }
 
         // Get the SupportMapFragment and request notification
         // when the map is ready to be used.
@@ -207,6 +239,165 @@ public class EditDetailedPostActivity extends AppCompatActivity {
         mRecyclerView.setAdapter(mAdapter);
     }
 
+    private void setupButtons() {
+
+        // Camera intent button
+        Button cButton = (Button) findViewById(R.id.cameraButton);
+
+        cButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+                if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+
+                    File photoFile;
+
+                    photoFile = getOutputMediaFile();
+
+                    if (photoFile != null) {
+
+                        photoURI = FileProvider.getUriForFile(EditDetailedPostActivity.this,
+                                "com.ucsc.taiyo.hypergaragesale.android.fileprovider",
+                                photoFile);
+
+                        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+
+                        startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+                    }
+
+                    // TODO: do I need to explicitly get back to NewPostActivity?
+
+                    // hide camera/gallery image
+                    mImageView.setVisibility(View.VISIBLE);
+                }
+
+            }
+        });
+
+        // Gallery intent button
+        Button gButton = (Button) findViewById(R.id.galleryButton);
+
+        gButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                try{
+                    Intent galleryIntet = new Intent(Intent.ACTION_PICK,
+                            android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+
+                    startActivityForResult(galleryIntet, RESULT_LOAD_IMAGE);
+
+                } catch(Exception exp){
+
+                    Log.i("Error", exp.toString());
+                }
+
+                // TODO: do I need to explicitly get back to NewPostActivity?
+
+                // hide camera/gallery image
+                mImageView.setVisibility(View.VISIBLE);
+            }
+        });
+
+        // FloatingActionButton to add photo image to ArrayList imagesArray
+        imageAddfab = (FloatingActionButton) findViewById(R.id.imageAddFab);
+
+        imageAddfab.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+
+                imagesArray.add(mCurrentPhotoPath);
+
+                imageAddfab.hide();
+            }
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+
+        // imageAddfab visible
+        imageAddfab.show();
+
+        if (resultCode != RESULT_OK) {
+
+            return;
+        }
+
+        // from camera
+        if (requestCode == REQUEST_TAKE_PHOTO) {
+
+            grabImage(mImageView);
+
+            fromGallery = false;
+        }
+
+        // from gallery
+        if (requestCode == RESULT_LOAD_IMAGE && null != intent) {
+
+            Uri selectedImage = intent.getData();
+
+            String[] filePathColumn = { MediaStore.Images.Media.DATA };
+
+            Cursor cursor = getContentResolver().query(selectedImage,
+                    filePathColumn, null, null, null);
+
+            cursor.moveToFirst();
+
+            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+
+            String picturePath = cursor.getString(columnIndex);
+
+            cursor.close();
+
+            mCurrentPhotoPath = picturePath;
+
+            try {
+
+                // do image-loading work in background
+                loadBitmap(mImageView, imageViewWidth, imageViewHeight);
+            }
+            catch (Exception e)
+            {
+                Log.e("Failed to load", e.getMessage());
+            }
+
+            //to know about the selected image width and height
+            Toast.makeText(EditDetailedPostActivity.this, mImageView.getDrawable().getIntrinsicWidth()+" & "+
+                    mImageView.getDrawable().getIntrinsicHeight(), Toast.LENGTH_SHORT).show();
+
+            //  note that we got the image from the picture gallery
+            fromGallery = true;
+        }
+    }
+
+    /**
+     *
+     * @param mImageView
+     */
+    public void grabImage(ImageView mImageView)
+    {
+        this.getContentResolver().notifyChange(photoURI, null);
+
+        ContentResolver cr = this.getContentResolver();
+
+        try
+        {
+
+            // load image in background
+            loadBitmap(mImageView, imageViewWidth, imageViewHeight);
+        }
+        catch (Exception e)
+        {
+            Log.e("Failed to load", e.getMessage());
+        }
+
+    }
+
     /**
      * Populate ArrayList detailedPost with a single DataBase position.
      * This will be the dataset for a photos-only RecyclerView, to be displayed
@@ -292,8 +483,6 @@ public class EditDetailedPostActivity extends AppCompatActivity {
 
         if (item.getItemId() == R.id.save) {
 
-            // TODO: update database
-
             // check location permission
             checkPermission();
 
@@ -303,12 +492,12 @@ public class EditDetailedPostActivity extends AppCompatActivity {
             // get list of images to remove: ArrayList<Integer>
             imagesToRemove = mAdapter.doneDetailedEdit();
 
-            // populate imagesArray, skip images tagged for removal
-            for (String path : photo.split(" ")) {
+            //for (String path : photo.split(" ")) {
+            for (String path: imagesToRemove) {
 
-                if (!imagesToRemove.contains(path)) {
+                if (imagesArray.contains(path)) {
 
-                    imagesArray.add(path);
+                    imagesArray.remove(path);
                 }
             }
 
@@ -317,11 +506,12 @@ public class EditDetailedPostActivity extends AppCompatActivity {
 
             showSnackBar(null);
 
-            // refresh browsePosts for search
-            //browsePosts = getDataSet(Integer.parseInt(position));
+            // hide camera/gallery image
+            mImageView.setVisibility(View.INVISIBLE);
 
-            // update RecyclerView dataSet
-            mAdapter.setFilter(getDataSet(Integer.parseInt(position)));
+            // update RecyclerView dataset
+            ArrayList<BrowsePosts> dataset = getDataSet(Integer.parseInt(position));
+            mAdapter.setFilter(dataset);
         }
 
         return super.onOptionsItemSelected(item);
@@ -408,6 +598,89 @@ public class EditDetailedPostActivity extends AppCompatActivity {
             // update application if provider hardware status changed.
         }
     };
+
+    /**
+     * Create a File for saving an image or video
+     * @return
+     */
+    private File getOutputMediaFile() {
+
+        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES), "HyperGarageSale");
+
+        //Boolean writable = isExternalStorageWritable();
+
+        // Assume thisActivity is the current activity
+        int permissionCheck = ContextCompat.checkSelfPermission(EditDetailedPostActivity.this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        if (permissionCheck == PackageManager.PERMISSION_DENIED) {
+
+            if (ActivityCompat.shouldShowRequestPermissionRationale(EditDetailedPostActivity.this,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+
+            } else {
+
+                ActivityCompat.requestPermissions(EditDetailedPostActivity.this,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
+            }
+        }
+
+        ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        // Create the storage directory if it does not exist
+        if (! mediaStorageDir.exists()){
+
+            if (! mediaStorageDir.mkdirs()){
+
+                Log.d("HyperGarageSale", "failed to create directory");
+
+                return null;
+            }
+        }
+
+        // Create a media file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+
+        File mediaFile;
+
+        mediaFile = new File(mediaStorageDir.getPath() + File.separator +
+                "IMG_" + timeStamp + ".jpg");
+
+        mCurrentPhotoPath = mediaFile.getAbsolutePath();
+
+        return mediaFile;
+    }
+
+    /**
+     * Load bitmap in background.
+     *
+     * @param imageView
+     * @param reqHeight
+     * @param reqWidth
+     */
+    public void loadBitmap(ImageView imageView, int reqHeight, int reqWidth) {
+
+        BitmapWorkerTask task = new BitmapWorkerTask(imageView, reqHeight, reqWidth);
+
+        task.execute(mCurrentPhotoPath);
+    }
+
+    /**
+     * Add photo image to gallery. (from Sopheap Heng)
+     */
+    private void galleryAddPic() {
+
+        File f = new File(mCurrentPhotoPath);
+
+        Uri contentUri = Uri.fromFile(f);
+
+        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, contentUri);
+
+        this.sendBroadcast(mediaScanIntent);
+    }
 
     /**
      *
