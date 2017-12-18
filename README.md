@@ -19,3 +19,9 @@ Implemented Functionality:
 
 - All BitmapFactory operations on AsyncTasks.
 
+
+To Do:
+
+- Create utilities class for common image capture and storage operations.
+
+- Fix obscured-description area in Edit Detailed Post activity.
