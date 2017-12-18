@@ -30,6 +30,7 @@ class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
     private int detailedImageViewSize = 1000;
     private int DetailedImageRecyclerViewSize = 3000;
     public static boolean editing = false;
+    public boolean detailedEditingDone = false;
 
     // Provide a reference to the views for each data item
     static class ViewHolder extends RecyclerView.ViewHolder {
@@ -108,17 +109,6 @@ class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
             parentShort = "detailed_recycler_view";
         }
 
-        // match edit_ first
-        /*
-        if (parentString.contains("edit_detailed_image_recycler_view")) {
-            // create a new view
-            v = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.edit_detailed_image_recycler_view, parent, false);
-
-            parentShort = "edit_detailed_image_recycler_view";
-        }
-        else
-        */
         if (parentString.contains("detailed_image_recycler_view")) {
             // create a new view
             v = LayoutInflater.from(parent.getContext())
@@ -196,10 +186,11 @@ class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
         // photoPathString: use as Mem Cache image key.
         if (parentShort.equals("posts_recycler_view")) {
             String pS[] = photoPathString.split(" ");
-            //holder.mPhoto.invalidate();
-            //holder.mPhoto.clearAnimation();
-            loadBitmap(pS[0], holder.mPhoto, listCameraImageViewSize,
-                    listCameraImageViewSize);
+
+            if (pS.length > 0) {
+                loadBitmap(pS[0], holder.mPhoto, listCameraImageViewSize,
+                        listCameraImageViewSize);
+            }
         }
         if (parentShort.equals("detailed_recycler_view")) {
             loadBitmap(photoPathString, holder.mPhoto, detailedImageViewSize,
@@ -275,7 +266,11 @@ class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
         }
 
         if (parentShort.equals("edit_detailed_recycler_view")) {
-            //photoPathString = mDataset.get(position).mPhoto;
+
+            if (detailedEditingDone) {
+
+                holder.mPhoto.setAlpha(1.0f);
+            }
 
             // Mark image for removal
             holder.mPhoto.setOnClickListener(new View.OnClickListener() {
@@ -337,6 +332,10 @@ class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
     }
 
     ArrayList<String> doneDetailedEdit() {
+
+        detailedEditingDone = true;
+
+        notifyDataSetChanged();
 
         return toRemoveImageList;
     }
