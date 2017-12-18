@@ -28,6 +28,7 @@ import android.widget.TextView;
 
 import com.google.android.gms.maps.SupportMapFragment;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**
@@ -53,6 +54,7 @@ public class EditDetailedPostActivity extends AppCompatActivity {
     private String[] loc;
     private MenuItem save;
     ArrayList<String> imagesArray = new ArrayList<>();
+    ArrayList<String> imagesToRemove = new ArrayList<>();
 
     String serviceString = Context.LOCATION_SERVICE;
     LocationManager locationManager;
@@ -298,15 +300,28 @@ public class EditDetailedPostActivity extends AppCompatActivity {
             // get last known location, expected by addPost()myLocationListener
             location = locationManager.getLastKnownLocation(provider);
 
-            // populate imagesArray from
+            // get list of images to remove: ArrayList<Integer>
+            imagesToRemove = mAdapter.doneDetailedEdit();
+
+            // populate imagesArray, skip images tagged for removal
             for (String path : photo.split(" ")) {
-                imagesArray.add(path);
+
+                if (!imagesToRemove.contains(path)) {
+
+                    imagesArray.add(path);
+                }
             }
 
-            // now add to dataBase
-            addPost();
+            // Update dataBase
+            updatePost();
 
             showSnackBar(null);
+
+            // refresh browsePosts for search
+            //browsePosts = getDataSet(Integer.parseInt(position));
+
+            // update RecyclerView dataSet
+            mAdapter.setFilter(getDataSet(Integer.parseInt(position)));
         }
 
         return super.onOptionsItemSelected(item);
@@ -314,9 +329,9 @@ public class EditDetailedPostActivity extends AppCompatActivity {
     }
 
     /**
-     * Add a post to the database.
+     * Update database.
      */
-    private void addPost() {
+    private void updatePost() {
 
         ContentValues values = new ContentValues();
         values.put(Posts.PostEntry.COLUMN_NAME_TITLE, titleText.getText().toString());

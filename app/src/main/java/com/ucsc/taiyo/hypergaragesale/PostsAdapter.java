@@ -23,6 +23,7 @@ class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
 
     private ArrayList<BrowsePosts> mDataset;
     private ArrayList<String> toRemoveList;
+    private ArrayList<String> toRemoveImageList = new ArrayList<>();
     private String parentShort = "";
     private String photoList = "";
     private int listCameraImageViewSize = 100;
@@ -274,7 +275,32 @@ class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
         }
 
         if (parentShort.equals("edit_detailed_recycler_view")) {
-            photoPathString = mDataset.get(position).mPhoto;
+            //photoPathString = mDataset.get(position).mPhoto;
+
+            // Mark image for removal
+            holder.mPhoto.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String photo = mDataset.get(position).mPhoto;
+
+                    float alpha = v.getAlpha();
+                    if (alpha != 1.0) {
+                        // image re-click, remove from list
+                        v.setAlpha(1.0f);
+
+                        int index = toRemoveImageList.indexOf(photo);
+                        toRemoveImageList.remove(index);
+                    }
+                    else {
+                        //dimm image, add to list
+                        v.setAlpha(0.2f);
+
+                        //toRemoveImageList.add(String.valueOf(position));
+                        toRemoveImageList.add(photo);
+                    }
+
+                }
+            });
         }
 
     }
@@ -308,6 +334,11 @@ class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
         editing = false;
 
         return toRemoveList;
+    }
+
+    ArrayList<String> doneDetailedEdit() {
+
+        return toRemoveImageList;
     }
 
 

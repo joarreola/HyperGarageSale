@@ -328,12 +328,10 @@ public class BrowsePostsActivity extends AppCompatActivity
             toRemoveList = mAdapter.doneRemove();
 
             db = mDbHelper.getWritableDatabase();
-            int preCount = getDatabaseCount(db);
             ArrayList<String> dbRows = getDatabaseRowIDs(db);
 
             String table = Posts.PostEntry.TABLE_NAME;
             String whereClause = "_id=?";
-            int delInt;
             for (String row : toRemoveList) {
 
                 // prune database
@@ -349,8 +347,6 @@ public class BrowsePostsActivity extends AppCompatActivity
                     Log.d("HyperGarageSale", "deleted row: " + String.valueOf(row));
                 }
             }
-            int postCount = getDatabaseCount(db);
-            dbRows = getDatabaseRowIDs(db);
 
             // refresh browsePosts for search
             browsePosts = getDataSet();
