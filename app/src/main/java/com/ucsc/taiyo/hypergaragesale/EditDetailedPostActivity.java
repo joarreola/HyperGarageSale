@@ -153,13 +153,6 @@ public class EditDetailedPostActivity extends AppCompatActivity {
             imagesArray.add(path);
         }
 
-        // Get the SupportMapFragment and request notification
-        // when the map is ready to be used.
-        //SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-        //        .findFragmentById(R.id.map);
-
-        //mapFragment.getMapAsync(this);
-
     }
 
     @Override
@@ -434,9 +427,6 @@ public class EditDetailedPostActivity extends AppCompatActivity {
 
         if (cursor.moveToPosition(position)) {
 
-            // validate location data
-            //locationString = "NO LOCATION";
-
             int locationInt = cursor.getColumnIndex(Posts.PostEntry.COLUMN_NAME_LOCATION);
 
             if (locationInt != -1) {
@@ -461,7 +451,6 @@ public class EditDetailedPostActivity extends AppCompatActivity {
             }
 
         }
-        //db.close();
 
         return detailedPost;
     }
@@ -499,6 +488,13 @@ public class EditDetailedPostActivity extends AppCompatActivity {
 
                     imagesArray.remove(path);
                 }
+            }
+
+            // update photo for sharedPreferences
+            photo = "";
+            for (String path : imagesArray) {
+
+                photo += path + " ";
             }
 
             // Update dataBase
@@ -601,14 +597,12 @@ public class EditDetailedPostActivity extends AppCompatActivity {
 
     /**
      * Create a File for saving an image or video
-     * @return
+     * @return mediaFile
      */
     private File getOutputMediaFile() {
 
         File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_PICTURES), "HyperGarageSale");
-
-        //Boolean writable = isExternalStorageWritable();
 
         // Assume thisActivity is the current activity
         int permissionCheck = ContextCompat.checkSelfPermission(EditDetailedPostActivity.this,
