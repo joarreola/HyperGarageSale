@@ -57,63 +57,44 @@
         android:paddingTop="@dimen/activity_vertical_margin"
         android:id="@+id/textView_desc" />
 
-    <!-- map stuff not needed for edit
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="horizontal"
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingRight="4dp"
-        android:paddingLeft="4dp" >
+        android:orientation="horizontal"
+        android:id="@+id/linearLayout">
 
-        <TextView
-            android:id="@+id/textView_loc"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:paddingTop="@dimen/activity_vertical_margin"
-            android:paddingRight="@dimen/activity_vertical_margin"
-            android:paddingEnd="@dimen/activity_vertical_margin"
-            android:textSize="18sp" />
+        <Button
+            android:id="@+id/cameraButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Camera"
+            android:textSize="12sp"
+            />
 
-        <fragment
-            android:id="@+id/map"
-            android:name="com.google.android.gms.maps.SupportMapFragment"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:paddingLeft="4dp"
-            android:paddingRight="4dp"
-            tools:context="com.ucsc.taiyo.hypergaragesale.DetailedPostActivity" />
+        <Button
+            android:id="@+id/galleryButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Gallery"
+            android:textSize="12sp"
+             />
+
+        <ImageView
+            android:id="@+id/CameraImageView"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="8dp"
+            android:paddingLeft="8dp"
+            app:srcCompat="@android:drawable/picture_frame" />
 
     </LinearLayout>
-    -->
 
-    <!-- works as a divider
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:layout_marginBottom="1dp"
-        android:layout_marginTop="1dp"
-        android:background="@android:color/darker_gray"/>
-    -->
-
-    <!--
-    <TextView
-        android:id="@+id/toFullSizeImages"
-        android:layout_width="wrap_content"
-        android:layout_height="40dp"
-        android:paddingTop="4dp"
-        android:paddingBottom="16dp"
-        android:paddingRight="4dp"
-        android:layout_gravity="end"
-        android:layout_marginBottom="4dp"
-        android:text="click photo to delete"
-        android:layout_weight="0.02"
-        android:textSize="12sp"
-        android:background="@android:color/background_light" />
-        -->
-    <!--
-    android:text="@string/to_full_size_activity_detailed_post"
-    -->
 
     <GridLayout
         android:layout_width="wrap_content"
@@ -146,5 +127,14 @@
 
 
 </LinearLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/imageAddFab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|left"
+        android:layout_margin="@dimen/fab_margin"
+        android:visibility="invisible"
+        app:srcCompat="@android:drawable/ic_input_add" />
 
 </android.support.design.widget.CoordinatorLayout>
