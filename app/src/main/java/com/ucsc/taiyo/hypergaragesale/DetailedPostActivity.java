@@ -1,5 +1,6 @@
 package com.ucsc.taiyo.hypergaragesale;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -16,6 +17,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -44,6 +46,7 @@ public class DetailedPostActivity extends AppCompatActivity implements OnMapRead
     String price;
     String desc;
     String photo;
+    String RowID;
     String[] loc;
     List<Address> addresses = null;
     private MenuItem edit;
@@ -53,18 +56,6 @@ public class DetailedPostActivity extends AppCompatActivity implements OnMapRead
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-
-        // manage stateful startedApp flags
-        /*
-        if (!isTaskRoot()) {
-            Intent intent = getIntent();
-            String action = intent.getAction();
-            if (intent.hasCategory(Intent.CATEGORY_LAUNCHER) && action != null && action.equals(Intent.ACTION_MAIN)) {
-                finish();
-                return;
-            }
-        }
-        */
 
         setContentView(R.layout.activity_detailed_post);
 
@@ -104,27 +95,34 @@ public class DetailedPostActivity extends AppCompatActivity implements OnMapRead
 
             photo = extras.getString("Photo");
 
+            RowID = extras.getString("RowID");
+
         }
         else {
 
-            SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+            //SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+            SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key),
+                    MODE_PRIVATE);
 
-            title = preferences.getString("Title", title);
+            title = sharedPref.getString("Title", title);
             titleText.append(title);
 
-            price = preferences.getString("Price", price);
+            price = sharedPref.getString("Price", price);
             priceText.append(price);
 
-            desc = preferences.getString("Desc", desc);
+            desc = sharedPref.getString("Desc", desc);
             descText.append(desc);
 
-            position = preferences.getString("Position", position);
+            position = sharedPref.getString("Position", position);
 
-            locationString = preferences.getString("Location", locationString);
+            locationString = sharedPref.getString("Location", locationString);
 
             loc = locationString.split(",");
 
-            photo = preferences.getString("Photo", photo);
+            photo = sharedPref.getString("Photo", photo);
+
+            RowID = sharedPref.getString("RowID", RowID);
+
         }
 
         // setup the photos-only detailed_recycler_view RecyclerView
@@ -184,8 +182,10 @@ public class DetailedPostActivity extends AppCompatActivity implements OnMapRead
         // Another activity comes into the foreground
         // Next: onResume() or onStop()
 
-        SharedPreferences preferences = getPreferences(MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
+        SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key),
+                MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.clear();
 
         editor.putString("Title", title);
 
@@ -198,6 +198,8 @@ public class DetailedPostActivity extends AppCompatActivity implements OnMapRead
         editor.putString("Location", locationString);
 
         editor.putString("Photo", photo);
+
+        editor.putString("RowID", RowID);
 
         // Commit to storage
         editor.commit();
@@ -363,10 +365,6 @@ public class DetailedPostActivity extends AppCompatActivity implements OnMapRead
         // edit item: edit
         edit = menu.findItem(R.id.edit);
 
-        // edit item: editDone
-        save = menu.findItem(R.id.save);
-        save.setVisible(false);
-
         return true;
     }
 
@@ -375,20 +373,26 @@ public class DetailedPostActivity extends AppCompatActivity implements OnMapRead
 
         if (item.getItemId() == R.id.edit) {
 
-            // display only save icon in toolbar
-            edit.setVisible(false);
-            save.setVisible(true);
+            // launch EditDetailedPostActivity
+            final Bundle bundle = new Bundle();
+
+            bundle.putString("Title", title);
+            bundle.putString("Price", price);
+            bundle.putString("Desc", desc);
+            bundle.putString("Position", position);
+            bundle.putString("Location", locationString);
+            bundle.putString("Photo", photo);
+            bundle.putString("RowID", RowID);
+
+            Context c = this.getApplicationContext();
+
+            Intent intent = new Intent(c, EditDetailedPostActivity.class);
+            intent.putExtras(bundle);
+
+            c.startActivity(intent);
 
         }
 
-        if (item.getItemId() == R.id.save) {
-
-            // re-display edit pencil and search in toolbar
-            edit.setVisible(true);
-            save.setVisible(false);
-
-           // TODO: Create a singleTop EditDetailedPostActivity
-        }
         return super.onOptionsItemSelected(item);
 
     }
